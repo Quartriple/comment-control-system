@@ -8,7 +8,8 @@ module.exports = {
       ignore_watch: [
         'node_modules',
         '*.db',
-        '*.db-journal'
+        '*.db-journal',
+        'sessions',
       ],
       env: {
         NODE_ENV: 'development',

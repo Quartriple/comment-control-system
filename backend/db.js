@@ -11,13 +11,26 @@ const sequelize = new Sequelize({
 // 모델 정의를 가져와서 데이터베이스와 연결
 const User = require('./models/user')(sequelize);
 const Comment = require('./models/comment')(sequelize);
+const Post = require('./models/post')(sequelize);
 
 // 모델들을 객체로 내보내 다른 파일에서 사용 가능
 const db = {
     sequelize,
     User,
-    Comment
+    Comment,
+    Post,
 };
+
+// 모델 관계 설정
+if (db.User.associate) {
+    db.User.associate(db);
+}
+if (db.Comment.associate) {
+    db.Comment.associate(db);
+}
+if (db.Post.associate) {
+    db.Post.associate(db);
+}
 
 // DB Schema 동기화
 async function syncDatabase() {
