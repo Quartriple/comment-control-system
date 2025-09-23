@@ -22,7 +22,7 @@ router.post('/signup', async (req, res) => {
             return res.status(409).json({ message: '이미 존재하는 사용자 이름입니다.' });
         }
 
-        // 비밀먼호 해싱
+        // 비밀번호 해싱
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = await db.User.create({

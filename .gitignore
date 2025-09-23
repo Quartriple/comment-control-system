@@ -9,6 +9,7 @@
 /backend/yarn-debug.log*
 /backend/pids/
 /backend/logs/
+/backend/sessions
 
 # Database files
 /backend/*.db

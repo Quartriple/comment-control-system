@@ -18,7 +18,7 @@ module.exports = (sequelize) => {
             defaultValue: 0,
         },
         // 진위 여부를 'TRUE', 'FALSE', 'UNSURE'로 저장
-        is_verified: {
+        veracity: {
             type: DataTypes.ENUM('TRUE', 'FALSE', 'UNSURE'),
             allowNull: false,
             defaultValue: 'TRUE',
