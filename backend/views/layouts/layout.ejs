@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/layout.css">
+    <link rel="stylesheet" href="/stylesheets/board.css">
+    <link rel="stylesheet" href="/stylesheets/login.css">
+    <link rel="stylesheet" href="/stylesheets/signup.css">
+    <!-- <link rel="stylesheet" href="/stylesheets/new.css"> -->
+    
+</head>
+<body>
+    <div class="wrapper">
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-top">
+                <div class="sidebar-header">
+                    <button class="toggle-btn" id="sidebar-toggle">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 6H20M4 12H20M4 18H20" stroke="#4B4B4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <% if (isLoggedIn) { %>
+                    <a href="/post/create" class="new-chat-btn">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 4C11.4477 4 11 4.44772 11 5V11H5C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13H11V19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19V13H19C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11H13V5C13 4.44772 12.5523 4 12 4Z" fill="#1a73e8"/>
+                        </svg>
+                        <span>새로운 글 작성</span>
+                    </a>
+                <% } %>
+                
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li>
+                            <a href="/">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 20H14C14 21.1046 13.1046 22 12 22C10.8954 22 10 21.1046 10 20ZM2 18V12.7262L12 2L22 12.7262V18H15V14H9V18H2Z" fill="#4B4B4B"/>
+                                </svg>
+                                <span>게시물 목록</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <% if (isLoggedIn) { %>
+                    <a href="/user/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 17L21 12L16 7M21 12H9M9 21H5C4.44772 21 4 20.5523 4 20V4C4 3.44772 4.44772 3 5 3H9" stroke="#4B4B4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>로그아웃</span>
+                    </a>
+                    <form id="logout-form" action="/user/logout" method="POST" style="display: none;"></form>
+                <% } else { %>
+                    <nav class="sidebar-nav">
+                        <ul>
+                            <li>
+                                <a href="/user/login">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11ZM12 13C7.2625 13 4 14.9375 4 17.25V18.5C4 19.3284 4.67157 20 5.5 20H18.5C19.3284 20 20 19.3284 20 18.5V17.25C20 14.9375 16.7375 13 12 13Z" fill="#4B4B4B"/>
+                                    </svg>
+                                    <span>로그인</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/user/signup">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M16 21V19C16 17.9391 15.5786 16.9217 14.8284 16.1716C14.0783 15.4214 13.0609 15 12 15C10.9391 15 9.92172 15.4214 9.17157 16.1716C8.42143 16.9217 8 17.9391 8 19V21M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="#4B4B4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span>회원가입</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                <% } %>
+            </div>
+        </aside>
+
+        <main class="content">
+            <%- body %>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebar-toggle');
+
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+            });
+        });
+    </script>
+</body>
+</html>

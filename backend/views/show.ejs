@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= post.title %></title>
+  <link rel="stylesheet" href="/stylesheet/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1><%= post.title %></h1>
+    <div class="meta">작성자: <strong><%= post.nickname %></strong> · 조회수 <%= post.views %> · 좋아요 <%= post.likes %></div>
+    <div class="content"><%= post.content || '' %></div>
+    <div class="actions">
+      <% if (user && (user.id === post.userId || user.is_admin)) { %>
+        <a class="btn" href="/posts/<%= post.id %>/edit">게시물 수정</a>
+        <form method="post" action="/posts/<%= post.id %>/delete" onsubmit="return confirm('삭제하시겠습니까?')" style="display:inline;">
+          <button class="btn danger" type="submit">게시물 삭제</button>
+        </form>
+      <% } %>
+      <a class="btn secondary" href="/">목록</a>
+    </div>
+
+    <div class="comment">
+      <h3>댓글</h3>
+      <% if (post.comments && post.comments.length) { %>
+        <% post.comments.forEach(function(c){ %>
+          <div class="comment-item" id="comment-<%= c.id %>">
+            <div style="font-size:13px;color:#6b7280">
+              작성자: <%= c.nickname || '익명' %> · <%= new Date(c.createdAt).toLocaleString('ko-KR') %>
+              <% if (user && (user.id === c.userId || user.is_admin)) { %>
+                <span style="margin-left:12px;">
+                  <button onclick="editComment(<%= c.id %>)" class="btn" style="padding:4px 8px;font-size:12px;margin-right:4px;">수정</button>
+                  <form method="post" action="/posts/<%= post.id %>/comments/<%= c.id %>/delete" onsubmit="return confirm('댓글을 삭제하시겠습니까?')" style="display:inline;">
+                    <button type="submit" class="btn danger" style="padding:4px 8px;font-size:12px;">삭제</button>
+                  </form>
+                </span>
+              <% } %>
+            </div>
+            <div class="comment-content"><%= c.content %></div>
+            <div class="comment-edit-form" style="display:none;">
+              <form method="post" action="/posts/<%= post.id %>/comments/<%= c.id %>/update">
+                <textarea name="content" required><%= c.content %></textarea>
+                <div class="actions" style="margin-top:8px;">
+                  <button type="submit" class="btn" style="padding:6px 12px;font-size:12px;">저장</button>
+                  <button type="button" onclick="cancelEdit(<%= c.id %>)" class="btn secondary" style="padding:6px 12px;font-size:12px;">취소</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="comment-item" style="color:#6b7280">아직 댓글이 없습니다.</div>
+      <% } %>
+
+      <% if (user) { %>
+        <form method="post" action="/posts/<%= post.id %>/comments" style="margin-top:12px">
+          <label>댓글 내용</label>
+          <textarea name="content" required></textarea>
+          <div class="actions">
+            <button class="btn" type="submit">댓글 등록</button>
+          </div>
+        </form>
+      <% } else { %>
+        <div style="margin-top:12px; padding:16px; background:#f8f9fa; border-radius:8px; text-align:center; color:#6b7280;">
+          댓글을 작성하려면 <a href="/login">로그인</a>해주세요.
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    function editComment(commentId) {
+      const commentItem = document.getElementById('comment-' + commentId);
+      const content = commentItem.querySelector('.comment-content');
+      const editForm = commentItem.querySelector('.comment-edit-form');
+      
+      content.style.display = 'none';
+      editForm.style.display = 'block';
+    }
+    
+    function cancelEdit(commentId) {
+      const commentItem = document.getElementById('comment-' + commentId);
+      const content = commentItem.querySelector('.comment-content');
+      const editForm = commentItem.querySelector('.comment-edit-form');
+      
+      content.style.display = 'block';
+      editForm.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
+
+

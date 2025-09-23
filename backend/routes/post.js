@@ -7,9 +7,9 @@ router.post('/', async (req, res) => {
     const { title, content } = req.body;
     const userId = req.session.userId;
 
-    // if (!userId) {
-    //     return res.status(401).json({ message: '로그인이 필요합니다.' });
-    // }
+    if (!userId) {
+        return res.status(401).json({ message: '로그인이 필요합니다.' });
+    }
 
     if (!title || !content) {
         return res.status(400).json({ message: '제목과 내용을 모두 입력해야 합니다.' });
@@ -30,6 +30,20 @@ router.post('/', async (req, res) => {
         console.error('게시물 생성 중 오류 발생:', error);
         res.status(500).json({ message: '서버 내부 오류가 발생했습니다.' });
     }
+});
+
+router.get('/new', (req, res) => {
+    if (!req.session.userId) {
+        return res.redirect('/user/login');
+    }
+
+    // `layout.ejs`에 필요한 데이터와 함께 뷰를 렌더링합니다.
+    res.render('new', {
+        title: "새 게시물 작성",
+        isLoggedIn: !!req.session.userId,
+        isAdmin: !!req.session.isAdmin,
+        nickname: req.session.nickname
+    });
 });
 
 // 게시물 조회
@@ -65,7 +79,8 @@ router.get('/', async (req, res) => {
             postsPerPage: limit,
             totalPages: Math.ceil(count / limit),
             posts: rows
-        })
+        });
+
     } catch (error) {
         console.error('게시물 조회 중 오류 발생:', error);
         res.status(500).json({ message: '서버 내부 오류가 발생했습니다.' });

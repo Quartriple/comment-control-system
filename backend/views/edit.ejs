@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>게시물 수정</title>
+  <link rel="stylesheet" href="/stylesheet/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>게시물 수정</h1>
+    <form method="post" action="/posts/<%= post.id %>/update">
+      <label>제목</label>
+      <input type="text" name="title" value="<%= post.title %>" required />
+
+      <label>내용</label>
+      <textarea name="content"><%= post.content || '' %></textarea>
+
+      <div class="row">
+        <div>
+          <label>작성자</label>
+          <select name="userId" required>
+            <% users.forEach(function(u){ %>
+              <option value="<%= u.id %>" <%= u.id === post.userId ? 'selected' : '' %>><%= u.nickname %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div>
+          <label>공개 여부</label>
+          <select name="is_published">
+            <option value="1" <%= post.is_published ? 'selected' : '' %>>공개</option>
+            <option value="0" <%= !post.is_published ? 'selected' : '' %>>비공개</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="submit">저장</button>
+        <a class="btn secondary" href="/posts/<%= post.id %>">취소</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
+
+

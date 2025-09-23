@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 대시보드</title>
+  <link rel="stylesheet" href="/stylesheet/style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="actions" style="justify-content: flex-end; margin-bottom: 16px;">
+        <a class="btn secondary" href="/">게시판 목록</a>
+        <form method="post" action="/logout" style="display:inline;">
+          <button class="btn secondary" type="submit">로그아웃</button>
+        </form>
+      </div>
+      
+      <h1>관리자 대시보드</h1>
+        <!-- Metrics Cards -->
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-title">진위판별</div>
+            <div class="metric-value error">판별불가?</div>
+            <div class="metric-icon">❓</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">혐오/욕설 수치</div>
+            <div class="metric-value">0%</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">작성일</div>
+            <div class="metric-value"><%= latestPost ? new Date(latestPost.createdAt).toLocaleDateString('ko-KR') : '-' %></div>
+          </div>
+        </div>
+
+        <!-- Post Details Card -->
+        <div class="details-card">
+          <div class="card-header">
+            <h2>[<%= latestPost ? latestPost.title + ' - ' + latestPost.nickname : '게시글이 없습니다' %>]</h2>
+            <div class="card-subtitle">판단 근거(세부)</div>
+          </div>
+          <div class="reasoning-list">
+            <div class="reasoning-item">
+              <span class="bullet">•</span>
+              <span class="reasoning-text">로그인 오류에 대한 문의 - '500 오류'라는 구체적인 기술적 문제 언급</span>
+            </div>
+            <div class="reasoning-item">
+              <span class="bullet">•</span>
+              <span class="reasoning-text">시간 정보 제공 - '어제 22시경에 시작됐습니다'라는 시간적 근거 제시</span>
+            </div>
+            <div class="reasoning-item">
+              <span class="bullet">•</span>
+              <span class="reasoning-text">스크린샷 첨부 언급 - '스크린샷 첨부'라는 추가 정보 제공</span>
+            </div>
+            <div class="reasoning-item">
+              <span class="bullet">•</span>
+              <span class="reasoning-text">문제의 반복성 언급 - '반복됩니다'라는 지속적인 문제 설명</span>
+            </div>
+            <div class="reasoning-item">
+              <span class="bullet">•</span>
+              <span class="reasoning-text">개인 정보 없음 - 작성자가 특정 개인이나 집단을 비하하지 않음</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Posts Card -->
+        <div class="posts-card">
+          <div class="card-header">
+            <h2>접수 글 목록</h2>
+          </div>
+          <div class="posts-table">
+            <div class="table-header">
+              <div class="col-title">제목</div>
+              <div class="col-name">이름</div>
+            </div>
+            <% if (recentPosts && recentPosts.length > 0) { %>
+              <% recentPosts.forEach(function(post){ %>
+                <div class="table-row">
+                  <div class="col-title"><%= post.title %></div>
+                  <div class="col-name"><%= post.nickname %></div>
+                </div>
+              <% }) %>
+            <% } else { %>
+              <div class="table-row">
+                <div class="col-title">게시글이 없습니다</div>
+                <div class="col-name">-</div>
+              </div>
+            <% } %>
+          </div>
+        </div>
+    </div>
+  </div>
+</body>
+</html>

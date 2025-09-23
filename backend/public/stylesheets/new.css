@@ -1,0 +1,109 @@
+/* new.css */
+
+/*
+ * .post-create-container 내부의 스타일만 정의합니다.
+ */
+
+.post-create-container {
+    padding: 2rem; /* 전체 컨테이너에 여백 추가 */
+}
+
+.post-create-container .card {
+    background-color: #ffffff;
+    padding: 2.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    max-width: 800px; /* 카드 너비 제한 */
+    margin: 0 auto; /* 중앙 정렬 */
+}
+
+.post-create-container h1 {
+    font-size: 2rem;
+    color: #343a40;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.post-create-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-create-container label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.post-create-container input[type="text"],
+.post-create-container textarea,
+.post-create-container select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.post-create-container input[type="text"]:focus,
+.post-create-container textarea:focus,
+.post-create-container select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.post-create-container textarea {
+    resize: vertical;
+    min-height: 150px; /* 최소 높이 설정 */
+}
+
+.post-create-container .row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.post-create-container .row > div {
+    flex-grow: 1;
+}
+
+.post-create-container .actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.post-create-container .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.post-create-container .btn[type="submit"] {
+    background-color: #007bff;
+    color: white;
+}
+
+.post-create-container .btn[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.post-create-container .btn.secondary {
+    background-color: #6c757d;
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.post-create-container .btn.secondary:hover {
+    background-color: #5a6268;
+}

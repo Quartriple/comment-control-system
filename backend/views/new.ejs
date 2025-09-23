@@ -1,0 +1,33 @@
+<div class="post-create-container">
+    <div class="container">
+      <div class="card">
+        <h1>글 작성</h1>
+        <form method="post" action="/post">
+          <label>제목</label>
+          <input type="text" name="title" required />
+
+          <label>내용</label>
+          <textarea name="content"></textarea>
+
+          <div class="row">
+            <div>
+              <label>작성자</label>
+              <input type="text" value="<%= nickname %>" disabled />
+            </div>
+            <div>
+              <label>공개 여부</label>
+              <select name="is_published">
+                <option value="1" selected>공개</option>
+                <option value="0">비공개</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn" type="submit">등록</button>
+            <a class="btn secondary" href="/">목록</a>
+          </div>
+        </form>
+      </div>
+    </div>
+</div>

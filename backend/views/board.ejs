@@ -1,0 +1,35 @@
+<div class="container">
+  <div class="card">
+    <h1>고객센터 게시판</h1>
+    <div class="sub">최근 등록된 글 목록입니다.</div>
+    <table>
+      <thead>
+        <tr>
+          <th class="left-col">글 번호</th>
+          <th>제목</th>
+          <th class="right-col">조회수</th>
+          <th class="right-col">좋아요</th>
+          <th class="right-col">이름</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (Array.isArray(posts) && posts.length) { %>
+          <% posts.forEach(function(post){ %>
+            <tr>
+              <td class="left-col"><%= post.id %></td>
+              <td><a href="/posts/<%= post.id %>"><%= post.title %></a></td>
+              <td class="right-col"><%= post.views %></td>
+              <td class="right-col"><%= post.likes %></td>
+              <td class="right-col"><%= //post.nickname %></td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="5" style="text-align:center; color:var(--muted); padding:24px;">게시글이 없습니다.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+    <a class="btn" href="/post/new" style="display:inline-block; text-decoration:none;">글 작성</a>
+  </div>
+</div>

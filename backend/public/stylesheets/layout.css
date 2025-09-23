@@ -1,0 +1,169 @@
+/* 기본 레이아웃 스타일 */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f4f9;
+}
+
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+    color: #333;
+}
+
+/* 사이드바 스타일 */
+.sidebar {
+    width: 280px;
+    background-color: #ffffff;
+    color: #4b4b4b;
+    padding: 1rem;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: width 0.3s ease, padding 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sidebar.collapsed {
+    width: 60px;
+    padding: 0.5rem;
+}
+
+/* 사이드바 헤더 */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.sidebar.collapsed .sidebar-header {
+    justify-content: center;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-right: -0.5rem;
+}
+
+.toggle-btn svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+}
+
+.sidebar.collapsed .toggle-btn svg {
+    transform: rotate(180deg);
+}
+
+.new-chat-btn {
+    display: flex;
+    align-items: center;
+    background-color: #e6f2ff;
+    color: #1a73e8;
+    border: none;
+    border-radius: 20px;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    width: 100%;
+}
+
+.sidebar.collapsed .new-chat-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+}
+
+.new-chat-btn:hover {
+    background-color: #d1e5ff;
+}
+
+.new-chat-btn svg {
+    margin-right: 0.5rem;
+    min-width: 20px;
+}
+
+.sidebar.collapsed .new-chat-btn svg {
+    margin-right: 0;
+}
+
+.new-chat-btn span {
+    white-space: nowrap;
+    overflow: hidden;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .new-chat-btn span {
+    opacity: 0;
+}
+
+/* 사이드바 네비게이션 */
+.sidebar-nav {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-top: 1rem;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav li {
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    color: #4b4b4b;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border-radius: 20px;
+    transition: background-color 0.2s;
+}
+
+.sidebar-nav a:hover {
+    background-color: #f0f4f9;
+}
+
+.sidebar-nav a svg {
+    min-width: 24px;
+    margin-right: 1rem;
+    fill: #4b4b4b;
+}
+
+.sidebar.collapsed .sidebar-nav a {
+    justify-content: center;
+    padding: 0.75rem 0.5rem;
+}
+
+.sidebar.collapsed .sidebar-nav a svg {
+    margin-right: 0;
+}
+
+.sidebar.collapsed .sidebar-nav a span {
+    display: none;
+}
+
+/* 사이드바 푸터 */
+.sidebar-footer {
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 2rem;
+}

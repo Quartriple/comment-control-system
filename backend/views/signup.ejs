@@ -1,0 +1,123 @@
+<div class="signup-container">
+    <h2 class="title">회원가입</h2>
+    <form id="signup-form" class="signup-form">
+        <div class="form-group">
+            <label for="username">사용자 이름 (ID)</label>
+            <input type="text" id="username" name="username" required>
+            <div id="username-status"></div>
+        </div>
+        <div class="form-group">
+            <label for="nickname">닉네임</label>
+            <input type="text" id="nickname" name="nickname" required>
+            <div id="nickname-status"></div>
+        </div>
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" class="signup-btn">회원가입</button>
+    </form>
+    <p class="login-link">
+        이미 계정이 있으신가요? <a href="/login">로그인</a>
+    </p>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const usernameInput = document.getElementById('username');
+        const nicknameInput = document.getElementById('nickname');
+        const passwordInput = document.getElementById('password');
+        const usernameStatus = document.getElementById('username-status');
+        const nicknameStatus = document.getElementById('nickname-status');
+        const signupForm = document.getElementById('signup-form');
+
+        // 아이디 중복 체크 함수
+        async function checkUsername() {
+            const username = usernameInput.value;
+            if (username.length === 0) {
+                usernameStatus.textContent = '';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/user/check-username?username=${username}`);
+                const result = await response.json();
+                if (result.available) {
+                    usernameStatus.textContent = '✅ 사용 가능한 ID입니다.';
+                    usernameStatus.style.color = 'green';
+                } else {
+                    usernameStatus.textContent = '❌ 이미 존재하는 ID입니다.';
+                    usernameStatus.style.color = 'red';
+                }
+            } catch (error) {
+                usernameStatus.textContent = '중복 확인 중 오류가 발생했습니다.';
+                usernameStatus.style.color = 'gray';
+                console.error('ID 중복 확인 오류:', error);
+            }
+        }
+
+        // 닉네임 중복 체크 함수
+        async function checkNickname() {
+            const nickname = nicknameInput.value;
+            if (nickname.length === 0) {
+                nicknameStatus.textContent = '';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/user/check-nickname?nickname=${nickname}`);
+                const result = await response.json();
+                if (result.available) {
+                    nicknameStatus.textContent = '✅ 사용 가능한 닉네임입니다.';
+                    nicknameStatus.style.color = 'green';
+                } else {
+                    nicknameStatus.textContent = '❌ 이미 존재하는 닉네임입니다.';
+                    nicknameStatus.style.color = 'red';
+                }
+            } catch (error) {
+                nicknameStatus.textContent = '중복 확인 중 오류가 발생했습니다.';
+                nicknameStatus.style.color = 'gray';
+                console.error('닉네임 중복 확인 오류:', error);
+            }
+        }
+
+        // 입력 필드에서 포커스를 잃었을 때(blur) 중복 체크
+        usernameInput.addEventListener('blur', checkUsername);
+        nicknameInput.addEventListener('blur', checkNickname);
+
+        // 폼 제출 이벤트 처리 (비동기)
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // 페이지 새로고침 방지
+
+            // 중복 체크가 완료되었는지 확인
+            if (usernameStatus.style.color === 'red' || nicknameStatus.style.color === 'red') {
+                alert('중복된 아이디 또는 닉네임이 있어 회원가입할 수 없습니다.');
+                return;
+            }
+
+            const username = usernameInput.value;
+            const nickname = nicknameInput.value;
+            const password = passwordInput.value;
+
+            try {
+                const response = await fetch('/user/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, nickname, password })
+                });
+                
+                const result = await response.json();
+
+                if (response.status === 201) {
+                    alert(result.message); // "회원가입 완료." 메시지
+                    window.location.href = '/user/login'; // 로그인 페이지로 이동
+                } else {
+                    alert('회원가입 실패: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error during signup:', error);
+                alert('서버 오류가 발생했습니다.');
+            }
+        });
+    });
+</script>

@@ -42,8 +42,16 @@ router.post('/signup', async (req, res) => {
         });
     } catch (error) {
         console.error('회원가입 중 오류 발생:', error);
-        res.status.jso({ message: 'Internal Server Error' });
+        res.status.json({ message: 'Internal Server Error' });
     }
+});
+
+router.get('/signup', (req, res) => {
+    res.render('signup', { 
+    title: "회원가입",
+    isLoggedIn: !!req.session.userId,
+    isAdmin: !!req.session.isAdmin
+  });
 });
 
 // ID 유효성 체크
@@ -121,6 +129,14 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.get('/login', (req, res) => {
+    res.render('login', { 
+    title: "로그인",
+    isLoggedIn: !!req.session.userId,
+    isAdmin: !!req.session.isAdmin
+  });
+});
+
 // 로그아웃
 router.post('/logout', (req, res) => {
     req.session.destroy(err => {
@@ -128,7 +144,7 @@ router.post('/logout', (req, res) => {
             console.error('로그아웃 중 오류 발생:', err);
             return res.status(500).json({ message: '로그아웃에 실패했습니다.' });
         }
-        res.status(200).json({ message: '성공적으로 로그아웃되었습니다.' });
+        res.redirect('/');
     });
 });
 
