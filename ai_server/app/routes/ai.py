@@ -37,7 +37,7 @@ prompt = ChatPromptTemplate.from_messages([
     - 출력:
     ```json
         {{
-            "hateful_score": 10,
+            "hate_score": 10,
             "hate_reasoning": "경쟁적인 스포츠 선수 비교에서 경멸적인 표현이 사용되었으나, 특정 개인이나 집단에 대한 심각한 혐오 표현은 아님.",
             "veracity": "TRUE",
             "veracity_reasoning": "리오넬 메시가 크리스티아누 호날두보다 더 많은 발롱도르를 수상한 것은 사실이다."
@@ -80,21 +80,21 @@ def detect_hate_speech():
     try:
         # LangChain 모델을 호출하여 댓글 분석
         result = chain.invoke({'input': comment})
-        print(result)
         
         # Node.js 백엔드 모델에 맞춰 데이터 형식 조정
-        hateful_score = int(result.get('hateful_score', 0))
-        is_verified_str = result.get('veracity', 'UNSURE').upper()
+        hate_score = int(result.get('hate_score', 0))
+        veracity_str = result.get('veracity', 'UNSURE').upper()
         
-        # is_verified ENUM 값에 대한 유효성 검사 (선택 사항)
         valid_enum_values = ['TRUE', 'FALSE', 'UNSURE']
-        if is_verified_str not in valid_enum_values:
-            is_verified_str = 'UNSURE'
+        if veracity_str not in valid_enum_values:
+            veracity_str = 'UNSURE'
 
         return jsonify({
-            'hateful_score': hateful_score,
-            'is_verified': is_verified_str,
-            'reason': result.get('veracity_reasoning', ''), # 백엔드 comments.js에 맞춤
+            'hate_score': hate_score,
+            'hate_reasoning': result.get('hate_reasoning', ''),
+            'veracity': veracity_str,
+            'veracity_reasoning': result.get('veracity_reasoning', ''),
+            'source': result.get('source', ''),
             'topic': result.get('topic', ''),
             'category': result.get('category', '')
         }), 200

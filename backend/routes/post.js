@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../db');
-const { off } = require('../app');
 
 // 게시물 작성
 router.post('/', async (req, res) => {

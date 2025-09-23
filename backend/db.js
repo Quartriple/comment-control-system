@@ -36,7 +36,7 @@ if (db.Post.associate) {
 async function syncDatabase() {
     try {
         // force: true, 동기화할 때마다 기존 테이블 삭제 및 재생성(**개발 단계에서만 사용!)
-        await sequelize.sync({ force: true });
+        await sequelize.sync({ force: false });
         console.log('Database synced successfully.');
     } catch (error) {
         console.log('Unable to sync the database.', error);
