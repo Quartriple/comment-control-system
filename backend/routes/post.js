@@ -125,6 +125,58 @@ router.patch('/:id', async (req, res) => {
     }
 });
 
+router.get('/:id/edit', async (req, res) => {
+    const postId = req.params.id;
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.redirect('/user/login');
+    }
+
+    try {
+        const post = await db.Post.findOne({
+            where: { id: postId },
+            include: [{
+                model: db.User, // 게시물 작성자 정보 포함
+                attributes: ['id', 'nickname']
+            }]
+        });
+
+        if (!post) {
+            return res.status(404).render('error', {
+                title: "오류",
+                message: '해당 게시물을 찾을 수 없습니다.'
+            });
+        }
+
+        const user = await db.User.findByPk(userId);
+        const isAdmin = user && user.is_admin;
+
+        // 게시물 작성자이거나 관리자만 수정 페이지에 접근 가능
+        if (post.userId !== userId && !isAdmin) {
+            return res.status(403).render('error', {
+                title: "권한 없음",
+                message: '게시물을 수정할 권한이 없습니다.'
+            });
+        }
+
+        res.render('edit', {
+            title: `게시물 수정: ${post.title}`,
+            isLoggedIn: !!userId,
+            isAdmin: isAdmin,
+            post: post,
+            users: await db.User.findAll({ attributes: ['id', 'nickname'] }) // 작성자 변경을 위한 사용자 목록
+        });
+
+    } catch (error) {
+        console.error('게시물 수정 페이지 로딩 중 오류 발생:', error);
+        res.status(500).render('error', {
+            title: "오류",
+            message: '서버 내부 오류가 발생했습니다.'
+        });
+    }
+});
+
 // 게시물 삭제
 router.delete('/:id', async (req, res) => {
     const userId = req.session.userId;

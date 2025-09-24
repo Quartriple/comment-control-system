@@ -1,0 +1,115 @@
+/* edit.css */
+
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #f8f9fa;
+    --card-background: #ffffff;
+    --border-color: #ced4da;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+}
+
+.edit-post-container {
+    padding: 2rem;
+}
+
+.edit-post-container .card {
+    background-color: var(--card-background);
+    padding: 2.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.edit-post-container h1 {
+    font-size: 2rem;
+    color: #343a40;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.edit-post-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-post-container label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+.edit-post-container input[type="text"],
+.edit-post-container textarea,
+.edit-post-container select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-bottom: 1.5rem;
+}
+
+.edit-post-container input[type="text"]:focus,
+.edit-post-container textarea:focus,
+.edit-post-container select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.edit-post-container textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.edit-post-container .row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.edit-post-container .row > div {
+    flex-grow: 1;
+}
+
+.edit-post-container .actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.edit-post-container .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.edit-post-container .btn[type="submit"] {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.edit-post-container .btn[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.edit-post-container .btn.secondary {
+    background-color: var(--secondary-color);
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.edit-post-container .btn.secondary:hover {
+    background-color: #5a6268;
+}

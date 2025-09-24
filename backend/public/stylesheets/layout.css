@@ -7,13 +7,16 @@ body {
 
 .wrapper {
     display: flex;
-    min-height: 100vh;
+    /* min-height: 100vh; -> 삭제 (사이드바 고정) */
     color: #333;
 }
 
 /* 사이드바 스타일 */
 .sidebar {
     width: 280px;
+    position: fixed; /* 사이드바를 화면에 고정*/
+    height: 100vh; /* 사이드바 높이를 화면 전체로 고정하여 스크롤 영향 제거*/
+    overflow-y: auto; /* 사이드바 내용이 길어지면 내부 스크롤바 생성*/
     background-color: #ffffff;
     color: #4b4b4b;
     padding: 1rem;
@@ -110,7 +113,7 @@ body {
 /* 사이드바 네비게이션 */
 .sidebar-nav {
     flex-grow: 1;
-    overflow-y: auto;
+    /* overflow-y: auto; -> 사이드바 상위 클래스로 이동 */
     margin-top: 1rem;
 }
 
@@ -136,6 +139,7 @@ body {
 
 .sidebar-nav a:hover {
     background-color: #f0f4f9;
+    padding: 0.75rem 1rem; /* hover 시에도 크기 유지*/
 }
 
 .sidebar-nav a svg {
@@ -166,4 +170,11 @@ body {
 .content {
     flex-grow: 1;
     padding: 2rem;
+    margin-left: 280px; /* 고정된 사이드바의 너비만큼 왼쪽 여백을 줘서 콘텐츠가 겹치지 않게 함*/
+    transition: margin-left 0.3s ease; /* 여백 변화를 부드럽게 처리 */
+}
+
+/* 사이드바가 축소되면, 콘텐츠의 왼쪽 여백을 사이드바의 축소된 너비(60px)만큼 줄입니다. */
+.sidebar.collapsed + .content {
+    margin-left: 60px;
 }

@@ -1,21 +1,28 @@
 <div class="post-view-container">
   <div class="card">
-    <h1><%= post.title %></h1>
+    <h1>
+      <%= post.title %>
+    </h1>
     <div class="meta">
-      <span>작성자: <strong><%= post.User ? post.User.nickname : '익명' %></strong></span>
+      <span>작성자: <strong>
+          <%= post.User ? post.User.nickname : '익명' %>
+        </strong></span>
       <span>조회수 <%= post.views %></span>
       <span>좋아요 <%= post.likes %></span>
       <span>작성일 <%= new Date(post.createdAt).toLocaleDateString('ko-KR') %></span>
     </div>
-    <div class="content"><%= post.content || '' %></div>
+    <div class="show-content">
+      <%= post.content || '' %>
+    </div>
     <div class="actions">
-      <% if (user && (user.id === post.userId || user.is_admin)) { %>
-        <a class="btn" href="/posts/<%= post.id %>/edit">게시물 수정</a>
-        <form method="post" action="/posts/<%= post.id %>/delete" onsubmit="return confirm('삭제하시겠습니까?')" style="display:inline;">
+      <% if (user && (user.id===post.userId || user.is_admin)) { %>
+        <a class="btn" href="/post/<%= post.id %>/edit">게시물 수정</a>
+        <form id="delete-post-form" method="post" onsubmit="return false;" style="display:inline;">
           <button class="btn danger" type="submit">게시물 삭제</button>
         </form>
-      <% } %>
-      <a class="btn secondary" href="/">목록</a>
+
+        <% } %>
+          <a class="btn secondary" href="/">목록</a>
     </div>
   </div>
 
@@ -25,20 +32,27 @@
       <% post.Comments.forEach(function(c){ %>
         <div class="comment-item" id="comment-<%= c.id %>">
           <div class="comment-header">
-            <span class="comment-author"><strong><%= c.User ? c.User.nickname : '익명' %></strong></span>
-            <span class="comment-date"><%= new Date(c.createdAt).toLocaleString('ko-KR') %></span>
-            <% if (user && (user.id === c.userId || user.is_admin)) { %>
+            <span class="comment-author"><strong>
+                <%= c.User ? c.User.nickname : '익명' %>
+              </strong></span>
+            <span class="comment-date">
+              <%= new Date(c.createdAt).toLocaleString('ko-KR') %>
+            </span>
+            <% if (user && (user.id===c.userId || user.is_admin)) { %>
               <span class="comment-actions">
                 <button onclick="editComment(<%= c.id %>)" class="btn-small btn-edit">수정</button>
-                <form method="post" action="/posts/<%= post.id %>/comments/<%= c.id %>/delete" onsubmit="return confirm('댓글을 삭제하시겠습니까?')" class="delete-form">
+                <form method="post" action="/comments/<%= c.id %>/delete" onsubmit="return confirm('댓글을 삭제하시겠습니까?')"
+                  class="delete-form">
                   <button type="submit" class="btn-small btn-delete">삭제</button>
                 </form>
               </span>
-            <% } %>
+              <% } %>
           </div>
-          <div class="comment-content"><%= c.content %></div>
+          <div class="comment-content">
+            <%= c.content %>
+          </div>
           <div class="comment-edit-form" style="display:none;">
-            <form method="post" action="/posts/<%= post.id %>/comments/<%= c.id %>/update">
+            <form onsubmit="saveComment(event, <%= c.id %>, <%= post.id %>)">
               <textarea name="content" required><%= c.content %></textarea>
               <div class="actions">
                 <button type="submit" class="btn-small btn-save">저장</button>
@@ -47,25 +61,25 @@
             </form>
           </div>
         </div>
-      <% }) %>
-    <% } else { %>
-      <div class="no-comments">아직 댓글이 없습니다.</div>
-    <% } %>
+        <% }) %>
+          <% } else { %>
+            <div class="no-comments">아직 댓글이 없습니다.</div>
+            <% } %>
 
-    <% if (user) { %>
-      <form class="new-comment-form" method="post" action="/comments">
-        <input type="hidden" name="postId" value="<%= post.id %>"/>
-        <label for="comment-content">댓글 작성</label>
-        <textarea id="comment-content" name="content" placeholder="댓글을 입력하세요..." required></textarea>
-        <div class="actions">
-          <button class="btn btn-primary" type="submit">댓글 등록</button>
-        </div>
-      </form>
-    <% } else { %>
-      <div class="login-prompt">
-        댓글을 작성하려면 <a href="/user/login">로그인</a>해주세요.
-      </div>
-    <% } %>
+              <% if (user) { %>
+                <form class="new-comment-form" method="post" action="/comments">
+                  <input type="hidden" name="postId" value="<%= post.id %>" />
+                  <label for="comment-content">댓글 작성</label>
+                  <textarea id="comment-content" name="content" placeholder="댓글을 입력하세요..." required></textarea>
+                  <div class="actions">
+                    <button class="btn btn-primary" type="submit">댓글 등록</button>
+                  </div>
+                </form>
+                <% } else { %>
+                  <div class="login-prompt">
+                    댓글을 작성하려면 <a href="/user/login">로그인</a>해주세요.
+                  </div>
+                  <% } %>
   </div>
 </div>
 
@@ -74,17 +88,74 @@
     const commentItem = document.getElementById('comment-' + commentId);
     const content = commentItem.querySelector('.comment-content');
     const editForm = commentItem.querySelector('.comment-edit-form');
-    
+
     content.style.display = 'none';
     editForm.style.display = 'block';
   }
-  
+
   function cancelEdit(commentId) {
     const commentItem = document.getElementById('comment-' + commentId);
     const content = commentItem.querySelector('.comment-content');
     const editForm = commentItem.querySelector('.comment-edit-form');
-    
+
     content.style.display = 'block';
     editForm.style.display = 'none';
   }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const deleteForm = document.getElementById('delete-post-form');
+    if (deleteForm) {
+      deleteForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // 기본 폼 제출 방지
+        const confirmed = confirm('게시물을 삭제하시겠습니까?');
+
+        if (confirmed) {
+          const postId = window.location.pathname.split('/').pop();
+          try {
+            const response = await fetch(`/post/${postId}`, {
+              method: 'DELETE',
+            });
+
+            if (response.ok) {
+              window.location.href = '/'; // 성공 시 게시물 목록 페이지로 리다이렉션
+            } else {
+              const errorData = await response.json();
+              alert('삭제 실패: ' + errorData.message);
+            }
+          } catch (error) {
+            console.error('Error during deletion:', error);
+            alert('서버 요청 중 오류가 발생했습니다.');
+          }
+        }
+      });
+    }
+  });
+
+  async function saveComment(event, commentId) {
+    event.preventDefault(); // 폼 제출 기본 동작 방지
+
+    const form = event.target;
+    const content = form.querySelector('textarea[name="content"]').value;
+
+    try {
+      const response = await fetch(`/comments/${commentId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: content }),
+      });
+
+      if (response.ok) {
+        window.location.reload(); // 성공 시 페이지 새로고침
+      } else {
+        const errorData = await response.json();
+        alert('댓글 수정 실패: ' + errorData.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('서버 요청 중 오류가 발생했습니다.');
+    }
+  }
+
 </script>

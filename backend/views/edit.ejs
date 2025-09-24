@@ -1,46 +1,62 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>게시물 수정</title>
-  <link rel="stylesheet" href="/stylesheet/style.css" />
-</head>
-<body>
-  <div class="container">
-    <h1>게시물 수정</h1>
-    <form method="post" action="/posts/<%= post.id %>/update">
-      <label>제목</label>
-      <input type="text" name="title" value="<%= post.title %>" required />
-
-      <label>내용</label>
-      <textarea name="content"><%= post.content || '' %></textarea>
-
-      <div class="row">
-        <div>
-          <label>작성자</label>
-          <select name="userId" required>
-            <% users.forEach(function(u){ %>
-              <option value="<%= u.id %>" <%= u.id === post.userId ? 'selected' : '' %>><%= u.nickname %></option>
-            <% }) %>
-          </select>
-        </div>
-        <div>
-          <label>공개 여부</label>
-          <select name="is_published">
-            <option value="1" <%= post.is_published ? 'selected' : '' %>>공개</option>
-            <option value="0" <%= !post.is_published ? 'selected' : '' %>>비공개</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn" type="submit">저장</button>
-        <a class="btn secondary" href="/posts/<%= post.id %>">취소</a>
-      </div>
-    </form>
-  </div>
-</body>
-</html>
-
-
+<div class="edit-post-container">
+  <div class="card">
+    <h1>게시물 수정</h1>
+    <form id="edit-post-form">
+      <label>제목</label>
+      <input type="text" name="title" value="<%= post.title %>" required />
+      <label>내용</label>
+      <textarea name="content"><%= post.content || '' %></textarea>
+      <div class="row">
+        <div>
+          <label>작성자</label>
+          <input type="text" value="<%= post.User.nickname %>" disabled />
+        </div>
+        <div>
+          <label>공개 여부</label>
+          <select name="is_published">
+            <option value="1" <%= post.is_published ? 'selected' : '' %>>공개</option>
+            <option value="0" <%= !post.is_published ? 'selected' : '' %>>비공개</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" type="submit">저장</button>
+        <a class="btn secondary" href="/post/<%= post.id %>">취소</a>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('edit-post-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const postId = window.location.pathname.split('/')[2];
+      const title = form.querySelector('[name="title"]').value;
+      const content = form.querySelector('[name="content"]').value;
+      const isPublished = form.querySelector('[name="is_published"]').value === '1';
+      try {
+        const response = await fetch(`/post/${postId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title,
+            content,
+            is_published: isPublished,
+          }),
+        });
+        if (response.ok) {
+          window.location.href = `/post/${postId}`;
+        } else {
+          const errorData = await response.json();
+          alert('수정 실패: ' + errorData.message);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('서버 요청 중 오류가 발생했습니다.');
+      }
+    });
+  });
+</script>
