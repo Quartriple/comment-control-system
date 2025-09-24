@@ -8,13 +8,16 @@
     <link rel="stylesheet" href="/stylesheets/board.css">
     <link rel="stylesheet" href="/stylesheets/login.css">
     <link rel="stylesheet" href="/stylesheets/signup.css">
-    <!-- <link rel="stylesheet" href="/stylesheets/new.css"> -->
+    <link rel="stylesheet" href="/stylesheets/new.css">
+    <link rel="stylesheet" href="/stylesheets/show.css">
+    <link rel="stylesheet" href="/stylesheets/admin.css">
     
 </head>
 <body>
     <div class="wrapper">
         <aside id="sidebar" class="sidebar">
             <div class="sidebar-top">
+                
                 <div class="sidebar-header">
                     <button class="toggle-btn" id="sidebar-toggle">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -24,14 +27,14 @@
                 </div>
                 
                 <% if (isLoggedIn) { %>
-                    <a href="/post/create" class="new-chat-btn">
+                    <a href="/post/new" class="new-chat-btn">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 4C11.4477 4 11 4.44772 11 5V11H5C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13H11V19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19V13H19C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11H13V5C13 4.44772 12.5523 4 12 4Z" fill="#1a73e8"/>
                         </svg>
                         <span>새로운 글 작성</span>
                     </a>
                 <% } %>
-                
+    
                 <nav class="sidebar-nav">
                     <ul>
                         <li>
@@ -42,6 +45,17 @@
                                 <span>게시물 목록</span>
                             </a>
                         </li>
+                        <% if (isAdmin) { %>
+                        <li>
+                            <a href="/admin">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#4B4B4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M12 16L12 12L16 12" stroke="#4B4B4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>관리자 대시보드</span>
+                            </a>
+                        </li>
+                        <% } %>
                     </ul>
                 </nav>
             </div>

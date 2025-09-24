@@ -1,0 +1,251 @@
+/* admin.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #5A67D8;
+    --secondary-color: #CBD5E0;
+    --text-color-primary: #1A202C;
+    --text-color-secondary: #4A5568;
+    --background-color: #F7FAFC;
+    --card-background: #FFFFFF;
+    --border-color: #E2E8F0;
+    --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --hover-color-primary: #4C51BF;
+    --danger-color: #E53E3E;
+    --success-color: #38A169;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color-primary);
+    line-height: 1.6;
+}
+
+.admin-dashboard {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color-primary);
+    margin: 0;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.admin-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-primary-btn {
+    background-color: var(--primary-color);
+    color: var(--card-background);
+}
+
+.admin-primary-btn:hover {
+    background-color: var(--hover-color-primary);
+    transform: translateY(-2px);
+}
+
+.admin-secondary-btn {
+    background-color: var(--secondary-color);
+    color: var(--text-color-primary);
+}
+
+.admin-secondary-btn:hover {
+    background-color: #A0AEC0;
+    transform: translateY(-2px);
+}
+
+.admin-danger-btn {
+    background-color: var(--danger-color);
+    color: var(--card-background);
+}
+
+.admin-danger-btn:hover {
+    background-color: #C53030;
+    transform: translateY(-2px);
+}
+
+.admin-small-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* Metrics Cards */
+.admin-metrics-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.admin-metric-card {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: var(--shadow-light);
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-metric-title {
+    font-size: 1rem;
+    color: var(--text-color-secondary);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.admin-metric-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+/* Sections */
+.admin-section {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: var(--shadow-light);
+    margin-bottom: 2rem;
+}
+
+.admin-section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 1.5rem 0;
+    color: var(--text-color-primary);
+}
+
+/* Filter Controls */
+.admin-filter-controls {
+    margin-bottom: 1.5rem;
+}
+
+.admin-filter-controls form {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.admin-filter-controls select,
+.admin-filter-controls input[type="text"] {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background-color: var(--background-color);
+}
+
+/* Table styles */
+.admin-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.9rem;
+}
+
+.admin-table thead th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-color-secondary);
+    padding: 1rem;
+    background: var(--background-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-table tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    word-break: break-all;
+}
+
+/* New styles for clickable rows */
+.admin-table .comment-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.admin-table .comment-row:hover,
+.admin-table .comment-row.active {
+    background-color: #F0F4F8;
+}
+
+.admin-table .comment-details {
+    background-color: #FAFAFA;
+}
+
+.admin-table .details-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.admin-table .details-content strong {
+    color: var(--primary-color);
+    min-width: 120px;
+    display: inline-block;
+}
+
+.admin-table a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.admin-table a:hover {
+    text-decoration: underline;
+}
+
+.admin-no-data {
+    text-align: center;
+    color: var(--text-color-secondary);
+    padding: 2rem;
+}
+
+.admin-comment-content {
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-hate-score {
+    color: var(--danger-color);
+    font-weight: 600;
+}

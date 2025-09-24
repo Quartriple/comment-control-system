@@ -11,6 +11,7 @@ const indexRouter = require('./routes/index');
 const commentsRouter = require('./routes/comments');
 const userRouter = require('./routes/user');
 const postRouter = require('./routes/post');
+const adminRouter = require('./routes/admin');
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use('/', indexRouter);
 app.use('/comments', commentsRouter);
 app.use('/user', userRouter);
 app.use('/post', postRouter);
+app.use('/admin', adminRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../db');
 
-
 router.get('/', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -26,12 +25,17 @@ router.get('/', async (req, res) => {
         const { count, rows } = await db.Post.findAndCountAll({
             limit: limit,
             offset: offset,
-            order: orderOption
+            order: orderOption,
+            include: [{ // 이 부분을 추가하여 User 모델을 함께 가져옵니다.
+                model: db.User,
+                attributes: ['nickname']
+            }]
         });
 
         const viewData = {
             title: "고객센터 게시판 · Admin 대시보드",
             isLoggedIn: req.session.userId ? true : false,
+            isAdmin: req.session.isAdmin,
             posts: rows
         };
 

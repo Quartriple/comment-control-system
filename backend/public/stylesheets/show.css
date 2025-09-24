@@ -1,0 +1,268 @@
+/* post-view.css */
+
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #5A67D8;
+    --secondary-color: #A0AEC0;
+    --text-color-primary: #1A202C;
+    --text-color-secondary: #4A5568;
+    --background-color: #F7FAFC;
+    --card-background: #FFFFFF;
+    --border-color: #E2E8F0;
+    --danger-color: #E53E3E;
+    --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --hover-color-primary: #4C51BF;
+    --hover-color-secondary: #718096;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color-primary);
+    line-height: 1.6;
+}
+
+.post-view-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.post-view-container .card {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-light);
+    margin-bottom: 2rem;
+}
+
+.post-view-container h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color-primary);
+    margin-bottom: 0.5rem;
+}
+
+.post-view-container .meta {
+    display: flex;
+    gap: 1.5rem;
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.post-view-container .content {
+    font-size: 1rem;
+    white-space: pre-wrap;
+    margin-bottom: 2rem;
+}
+
+.post-view-container .actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+/* Button styles */
+.post-view-container .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.post-view-container .btn.primary {
+    background-color: var(--primary-color);
+    color: var(--card-background);
+}
+
+.post-view-container .btn.primary:hover {
+    background-color: var(--hover-color-primary);
+    transform: translateY(-2px);
+}
+
+.post-view-container .btn.secondary {
+    background-color: var(--secondary-color);
+    color: var(--text-color-primary);
+}
+
+.post-view-container .btn.secondary:hover {
+    background-color: var(--hover-color-secondary);
+    transform: translateY(-2px);
+}
+
+.post-view-container .btn.danger {
+    background-color: var(--danger-color);
+    color: var(--card-background);
+}
+
+.post-view-container .btn.danger:hover {
+    background-color: #C53030;
+    transform: translateY(-2px);
+}
+
+.post-view-container .btn-small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.btn-small.btn-edit { background-color: var(--secondary-color); color: var(--text-color-primary); }
+.btn-small.btn-edit:hover { background-color: var(--hover-color-secondary); }
+.btn-small.btn-delete { background-color: var(--danger-color); color: var(--card-background); }
+.btn-small.btn-delete:hover { background-color: #C53030; }
+.btn-small.btn-save { background-color: var(--primary-color); color: var(--card-background); }
+.btn-small.btn-save:hover { background-color: var(--hover-color-primary); }
+.btn-small.btn-cancel { background-color: var(--secondary-color); color: var(--text-color-primary); }
+.btn-small.btn-cancel:hover { background-color: var(--hover-color-secondary); }
+
+/* Comments section */
+.comments-section h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-color-primary);
+}
+
+.comment-item {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.comment-item:first-of-type {
+    padding-top: 0;
+}
+
+.comment-item:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: var(--text-color-primary);
+}
+
+.comment-date {
+    font-size: 0.8rem;
+    color: var(--text-color-secondary);
+}
+
+.comment-content {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--primary-color);
+}
+
+.comment-edit-form textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    min-height: 80px;
+    margin-bottom: 0.5rem;
+}
+
+.comment-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.new-comment-form {
+    margin-top: 2rem;
+}
+
+.new-comment-form label {
+    margin-top: 0;
+}
+
+.new-comment-form textarea {
+    min-height: 100px;
+}
+
+.login-prompt {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--text-color-secondary);
+    margin-top: 2rem;
+}
+
+.login-prompt a {
+    color: var(--primary-color);
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.new-comment-form {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.new-comment-form label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-color-primary);
+}
+
+.new-comment-form textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    min-height: 120px;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: var(--background-color);
+    color: var(--text-color-primary);
+}
+
+.new-comment-form textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.2);
+    outline: none;
+}
+
+.new-comment-form .actions {
+    margin-top: 1.5rem;
+    justify-content: flex-end;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--card-background);
+}
+
+.btn-primary:hover {
+    background-color: var(--hover-color-primary);
+    transform: translateY(-2px);
+}

@@ -22,10 +22,7 @@ router.post('/', async (req, res) => {
             userId: userId
         });
 
-        res.status(201).json({
-            message: '게시물 생성 성공!',
-            post: newPost
-        });
+        res.redirect('/');
     } catch (error) {
         console.error('게시물 생성 중 오류 발생:', error);
         res.status(500).json({ message: '서버 내부 오류가 발생했습니다.' });
@@ -173,25 +170,44 @@ router.get('/:id', async (req, res) => {
     try {
         const post = await db.Post.findOne({
             where: { id: postId },
-            // include 옵션을 사용하여 관련 모델(Comment)의 데이터도 함께 가져옴
             include: [{
+                model: db.User, // 게시물 작성자 정보 포함
+                attributes: ['nickname', 'is_admin']
+            }, {
                 model: db.Comment,
                 as: 'Comments',
-                order: [['createdAt', 'DESC']]
+                order: [['createdAt', 'DESC']],
+                include: [{
+                    model: db.User, // 댓글 작성자 정보 포함
+                    attributes: ['nickname', 'is_admin']
+                }]
             }]
         });
 
         if (!post) {
-            return res.status(404).json({ message: '해당 게시물을 찾을 수 없습니다.' });
+            return res.status(404).render('error', {
+                title: "오류",
+                message: '해당 게시물을 찾을 수 없습니다.'
+            });
         }
 
-        res.status(200).json({
-            post: post
+        // 조회수 증가 로직 (선택사항)
+        await post.increment('views');
+
+        res.render('show', {
+            title: post.title,
+            isLoggedIn: !!req.session.userId,
+            isAdmin: req.session.isAdmin,
+            user: req.session.userId ? { id: req.session.userId, is_admin: req.session.isAdmin } : null,
+            post: post,
         });
 
     } catch (error) {
         console.error('게시물 상세 조회 중 오류 발생:', error);
-        res.status(500).json({ message: '서버 내부 오류가 발생했습니다.' });
+        res.status(500).render('error', {
+            title: "오류",
+            message: '서버 내부 오류가 발생했습니다.'
+        });
     }
 });
 

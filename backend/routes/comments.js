@@ -8,8 +8,8 @@ router.post('/', async (req, res) => {
     let { userId } =  req.session;
 
     if (!userId) {
-        // return res.status(401).json({ message: '로그인이 필요합니다.' });
-        userId = 1;
+        alert('로그인이 필요합니다.');
+        return res.redirect('/user/login');
     }
 
     try {
@@ -41,11 +41,7 @@ router.post('/', async (req, res) => {
             postId: postId         
         });
 
-        res.status(201).json({
-            message: 'Comment submitted successfully.',
-            comment: newComment,
-            // analysis: aiResult,
-        });
+        res.redirect('back');
 
     } catch (error) {
         console.error('Error submitting comment:', error);
@@ -165,7 +161,7 @@ router.patch('/:id', async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.post('/:id/delete', async (req, res) => {
     const commentId = req.params.id;
     let userId = req.session.userId || 1; // 테스트용 향후, 수정
 
@@ -191,7 +187,7 @@ router.delete('/:id', async (req, res) => {
             where: { id: commentId }
         });
 
-        res.status(200).json({ message: '댓글이 성공적으로 삭제되었습니다.' });
+        res.redirect('back');
 
     } catch (error) {
         console.error('Error deleting comment:', error);

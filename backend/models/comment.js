@@ -12,7 +12,7 @@ module.exports = (sequelize) => {
             allowNull: false,
         },
         // 혐오도를 0 ~ 100 사이의 정수 값으로 저장
-        hateful_score: {
+        hate_score: {
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0,

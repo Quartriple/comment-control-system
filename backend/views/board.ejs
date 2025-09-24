@@ -9,7 +9,7 @@
           <th>제목</th>
           <th class="right-col">조회수</th>
           <th class="right-col">좋아요</th>
-          <th class="right-col">이름</th>
+          <th class="right-col">작성자</th>
         </tr>
       </thead>
       <tbody>
@@ -17,10 +17,10 @@
           <% posts.forEach(function(post){ %>
             <tr>
               <td class="left-col"><%= post.id %></td>
-              <td><a href="/posts/<%= post.id %>"><%= post.title %></a></td>
+              <td><a href="/post/<%= post.id %>"><%= post.title %></a></td>
               <td class="right-col"><%= post.views %></td>
               <td class="right-col"><%= post.likes %></td>
-              <td class="right-col"><%= //post.nickname %></td>
+              <td class="right-col"><%= post.User.nickname %></td>
             </tr>
           <% }) %>
         <% } else { %>
