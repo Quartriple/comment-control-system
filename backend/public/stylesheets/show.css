@@ -124,9 +124,9 @@ body {
 .btn-small.btn-edit:hover { background-color: var(--hover-color-secondary); }
 .btn-small.btn-delete { background-color: var(--danger-color); color: var(--card-background); border: none}
 .btn-small.btn-delete:hover { background-color: #C53030; }
-.btn-small.btn-save { background-color: var(--primary-color); color: var(--card-background); }
+.btn-small.btn-save { background-color: var(--primary-color); color: var(--card-background); border: none}
 .btn-small.btn-save:hover { background-color: var(--hover-color-primary); }
-.btn-small.btn-cancel { background-color: var(--secondary-color); color: var(--text-color-primary); }
+.btn-small.btn-cancel { background-color: var(--secondary-color); color: var(--text-color-primary); border: none}
 .btn-small.btn-cancel:hover { background-color: var(--hover-color-secondary); }
 
 /* Comments section */
@@ -138,8 +138,8 @@ body {
 }
 
 .comment-item {
-    padding: 1.5rem 0;
-    border-bottom: 1px solid var(--border-color);
+    /* padding: 1.5rem 0; */
+    /* border-bottom: 1px solid var(--border-color); */
 }
 
 .comment-item:first-of-type {
@@ -265,4 +265,101 @@ body {
 .btn-primary:hover {
     background-color: var(--hover-color-primary);
     transform: translateY(-2px);
+}
+
+.comment-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    position: relative; /* 중요: 드롭다운 위치 지정을 위해 추가 */
+}
+
+/* Style for the "More" button (Three dots) */
+.post-view-container .btn-small.btn-more {
+    background: none;
+    color: var(--text-color-secondary);
+    padding: 0.4rem; 
+    border-radius: 50%; 
+    line-height: 0;
+    transition: background-color 0.2s;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20; 
+}
+.post-view-container .btn-small.btn-more:hover {
+    background-color: var(--background-color);
+    transform: none;
+}
+
+/* Dropdown menu container style */
+.comment-actions-dropdown {
+    position: absolute; 
+    top: 100%; 
+    right: 0;
+    z-index: 30; /* Ensure it is above other elements */
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column; /* Stack options vertically */
+    align-items: stretch;
+    min-width: 120px;
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+}
+
+/* Style for buttons inside the dropdown to look like menu items */
+.comment-actions-dropdown .btn-small {
+    padding: 0.6rem 1rem !important; /* Larger padding for menu item feel */
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    text-align: left !important;
+    width: 100%;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    color: var(--text-color-primary) !important;
+    transition: background-color 0.2s;
+}
+
+/* Hover style for all menu items */
+.comment-actions-dropdown .btn-small:hover {
+    background-color: var(--background-color) !important;
+    transform: none !important;
+}
+
+/* Specific button text colors */
+.comment-actions-dropdown .btn-delete {
+    color: var(--danger-color) !important;
+}
+
+.comment-actions-dropdown .btn-report {
+    /* 신고하기 버튼은 주황색 계열로 표시 */
+    color: #FF9800 !important; /* Orange/Warning color */
+}
+
+/* Ensure the delete form button acts like a menu item */
+.comment-actions-dropdown .delete-form {
+    display: block; /* Form takes full width */
+}
+
+.comment-actions-dropdown .delete-form button {
+    padding: 0.6rem 1rem !important; 
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    text-align: left !important;
+    width: 100%;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    color: var(--danger-color) !important;
+    transition: background-color 0.2s;
+}
+
+.comment-actions-dropdown .delete-form button:hover {
+    background-color: var(--background-color) !important;
 }

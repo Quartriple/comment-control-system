@@ -22,22 +22,48 @@ router.get('/', async (req, res) => {
 
         const orderOption = [[sortBy, sortOrder.toUpperCase()]];
 
-        const { count, rows } = await db.Post.findAndCountAll({
+        const totalPostCount = await db.Post.count();
+        const totalPages = Math.ceil(totalPostCount / limit);
+
+        const postsWithCommentCount = await db.Post.findAll({
             limit: limit,
             offset: offset,
             order: orderOption,
-            include: [{ // 이 부분을 추가하여 User 모델을 함께 가져옵니다.
-                model: db.User,
-                attributes: ['nickname']
-            }]
+            include: [
+                {
+                    model: db.User,
+                    attributes: ['nickname']
+                },
+                { // 댓글 모델을 LEFT JOIN으로 포함하여 개수를 계산합니다.
+                    model: db.Comment,
+                    attributes: [],
+                    duplicating: false,
+                    required: false // LEFT JOIN
+                }
+            ],
+            attributes: {
+                include: [
+                    // 댓글 개수를 'commentCount'라는 이름으로 집계합니다.
+                    [db.sequelize.fn('COUNT', db.sequelize.col('Comments.id')), 'commentCount']
+                ]
+            },
+            group: ['Post.id'], // 게시물 ID별로 그룹화합니다.
+            subQuery: false
         });
 
         const viewData = {
             title: "고객센터 게시판 · Admin 대시보드",
             isLoggedIn: req.session.userId ? true : false,
             isAdmin: req.session.isAdmin,
-            posts: rows
+            posts: postsWithCommentCount, // 수정된 데이터 사용
+            totalPosts: totalPostCount, // 총 개수 사용
+            currentPage: page,
+            limit: limit,
+            totalPages: totalPages,
+            sortBy: sortBy,
+            sortOrder: sortOrder,
         };
+
 
         res.render('board', viewData);
 

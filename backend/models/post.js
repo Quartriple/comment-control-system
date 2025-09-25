@@ -33,7 +33,7 @@ module.exports = (sequelize) => {
     }, {
         tableName: 'posts',
         timestamps: true, // `createdAt`과 `updatedAt` 자동 추가.
-        paranoid: true, // 소프트 삭제(바로 삭제x, `deletedAt` 컬럼을 통해 보여질지 말지 관리)를 활성화합니다.
+        // paranoid: true, // 소프트 삭제(바로 삭제x, `deletedAt` 컬럼을 통해 보여질지 말지 관리)를 활성화합니다.
     });
 
     // 사용자 모델과 관계 설정

@@ -249,3 +249,29 @@ body {
     color: var(--danger-color);
     font-weight: 600;
 }
+
+.btn-page {
+    background-color: var(--card-background);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-page:hover:not(.active) {
+    background-color: #E6E8F6; /* Light primary color */
+}
+
+.btn-page.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.btn-page-nav {
+    font-weight: 600;
+    min-width: 60px;
+}

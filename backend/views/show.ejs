@@ -17,14 +17,14 @@
     <div class="actions">
       <% if (user && (user.id===post.userId)) { %>
         <a class="btn primary" href="/post/<%= post.id %>/edit">게시물 수정</a>
-      <% } %>
-      <% if (user && (user.id===post.userId || user.is_admin)) { %>
-        <form id="delete-post-form" method="post" onsubmit="return false;" style="display:inline;">
-          <button class="btn danger" type="submit">게시물 삭제</button>
-        </form>
+        <% } %>
+          <% if (user && (user.id===post.userId || user.is_admin)) { %>
+            <form id="delete-post-form" method="post" onsubmit="return false;" style="display:inline;">
+              <button class="btn danger" type="submit">게시물 삭제</button>
+            </form>
 
-      <% } %>
-          <a class="btn secondary" href="/">목록</a>
+            <% } %>
+              <a class="btn secondary" href="/">목록</a>
     </div>
   </div>
 
@@ -34,34 +34,54 @@
       <% post.Comments.forEach(function(c){ %>
         <div class="comment-item" id="comment-<%= c.id %>">
           <div class="comment-header">
-            <span class="comment-author"><strong>
+            <span class="comment-author">
+              <strong>
                 <%= c.User ? c.User.nickname : '익명' %>
-              </strong></span>
+              </strong>
+            </span>
             <span class="comment-date">
               <%= new Date(c.createdAt).toLocaleString('ko-KR') %>
             </span>
-            <% if (user && (user.id===c.userId || user.is_admin)) { %>
+            <% if (user) { %>
               <span class="comment-actions">
-                <button onclick="editComment(<%= c.id %>)" class="btn-small btn-edit">수정</button>
-                <form method="post" action="/comments/<%= c.id %>/delete" onsubmit="return confirm('댓글을 삭제하시겠습니까?')"
-                  class="delete-form">
-                  <button type="submit" class="btn-small btn-delete">삭제</button>
-                </form>
+                <button onclick="toggleCommentActions(<%= c.id %>)" class="btn-small btn-more">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                    <path
+                      d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-14 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                  </svg>
+                </button>
+                <div class="comment-actions-dropdown" id="actions-<%= c.id %>" style="display:none;">
+                  <% if (user.id===c.userId) { %>
+                    <button type="button" onclick="editComment(<%= c.id %>)" class="btn-small btn-edit">수정</button>
+                    <form method="post" action="/comments/<%= c.id %>/delete" onsubmit="return confirm('댓글을 삭제하시겠습니까?')"
+                      class="delete-form">
+                      <button type="submit" class="btn-small btn-delete">삭제</button>
+                    </form>
+                    <% } else if (user.is_admin) { %>
+                      <form method="post" action="/comments/<%= c.id %>/delete"
+                        onsubmit="return confirm('댓글을 삭제하시겠습니까?')" class="delete-form">
+                        <button type="submit" class="btn-small btn-delete">삭제</button>
+                      </form>
+                      <% } else { %>
+                        <button type="button" onclick="reportComment(<%= c.id %>)"
+                          class="btn-small btn-report">신고하기</button>
+                        <% } %>
+                </div>
               </span>
               <% } %>
           </div>
-          <div class="comment-content">
-            <%= c.content %>
-          </div>
-          <div class="comment-edit-form" style="display:none;">
-            <form onsubmit="saveComment(event, <%= c.id %>, <%= post.id %>)">
-              <textarea name="content" required><%= c.content %></textarea>
-              <div class="actions">
-                <button type="submit" class="btn-small btn-save">저장</button>
-                <button type="button" onclick="cancelEdit(<%= c.id %>)" class="btn-small btn-cancel">취소</button>
-              </div>
-            </form>
-          </div>
+        </div>
+        <div class="comment-content">
+          <%= c.content %>
+        </div>
+        <div class="comment-edit-form" style="display:none;">
+          <form onsubmit="saveComment(event, <%= c.id %>, <%= post.id %>)">
+            <textarea name="content" required><%= c.content %></textarea>
+            <div class="actions">
+              <button type="submit" class="btn-small btn-save">저장</button>
+              <button type="button" onclick="cancelEdit(<%= c.id %>)" class="btn-small btn-cancel">취소</button>
+            </div>
+          </form>
         </div>
         <% }) %>
           <% } else { %>
@@ -88,17 +108,25 @@
 <script>
   function editComment(commentId) {
     const commentItem = document.getElementById('comment-' + commentId);
-    const content = commentItem.querySelector('.comment-content');
-    const editForm = commentItem.querySelector('.comment-edit-form');
+
+    const content = commentItem.nextElementSibling;
+    const editForm = content.nextElementSibling;
+
+    const dropdown = document.getElementById('actions-' + commentId);
 
     content.style.display = 'none';
     editForm.style.display = 'block';
+
+    if (dropdown) {
+      dropdown.style.display = 'none';
+    }
   }
 
   function cancelEdit(commentId) {
     const commentItem = document.getElementById('comment-' + commentId);
-    const content = commentItem.querySelector('.comment-content');
-    const editForm = commentItem.querySelector('.comment-edit-form');
+
+    const content = commentItem.nextElementSibling;
+    const editForm = content.nextElementSibling;
 
     content.style.display = 'block';
     editForm.style.display = 'none';
@@ -159,5 +187,42 @@
       alert('서버 요청 중 오류가 발생했습니다.');
     }
   }
+
+  function reportComment(commentId) {
+    alert(`댓글 ID ${commentId}를 신고했습니다. (신고 로직은 서버에 별도 구현 필요)`);
+    // 신고 후 드롭다운 닫기
+    document.getElementById('actions-' + commentId).style.display = 'none';
+  }
+
+  function toggleCommentActions(commentId) {
+    const dropdown = document.getElementById('actions-' + commentId);
+
+    // 현재 드롭다운 상태 확인
+    if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+      // 다른 모든 드롭다운 닫기
+      document.querySelectorAll('.comment-actions-dropdown').forEach(d => {
+        d.style.display = 'none';
+      });
+      // 현재 드롭다운 열기
+      dropdown.style.display = 'inline-flex'; // 버튼들을 가로로 표시
+    } else {
+      // 현재 드롭다운 닫기
+      dropdown.style.display = 'none';
+    }
+  }
+
+  // 드롭다운 외부 클릭 시 닫기
+  document.addEventListener('click', (event) => {
+    const isMoreButton = event.target.closest('.btn-more');
+    const isDropdown = event.target.closest('.comment-actions-dropdown');
+
+    // 만약 클릭한 요소가 더보기 버튼도 아니고 드롭다운 자체도 아니라면 모두 닫기
+    if (!isMoreButton && !isDropdown) {
+      document.querySelectorAll('.comment-actions-dropdown').forEach(d => {
+        d.style.display = 'none';
+      });
+    }
+  });
+
 
 </script>

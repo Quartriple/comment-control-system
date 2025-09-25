@@ -1,3 +1,5 @@
+// backend/views/admin.ejs
+
 <div class="admin-dashboard">
   <div class="admin-header">
     <h1 class="admin-title">관리자 대시보드</h1>
@@ -8,24 +10,28 @@
       </form>
     </div>
   </div>
-  
-  <!-- Metrics Cards -->
+
   <div class="admin-metrics-row">
     <div class="admin-metric-card">
       <div class="admin-metric-title">총 게시물 수</div>
-      <div class="admin-metric-value"><%= postCount %></div>
+      <div class="admin-metric-value">
+        <%= postCount %>
+      </div>
     </div>
     <div class="admin-metric-card">
       <div class="admin-metric-title">총 댓글 수</div>
-      <div class="admin-metric-value"><%= commentCount %></div>
+      <div class="admin-metric-value" id="comment-count-display">
+        <%= commentCount %>
+      </div>
     </div>
     <div class="admin-metric-card">
       <div class="admin-metric-title">총 사용자 수</div>
-      <div class="admin-metric-value"><%= userCount %></div>
+      <div class="admin-metric-value">
+        <%= userCount %>
+      </div>
     </div>
   </div>
 
-  <!-- Recent Posts Section -->
   <div class="admin-section">
     <h2 class="admin-section-title">최근 게시물</h2>
     <table class="admin-table">
@@ -36,109 +42,354 @@
           <th>작성자</th>
           <th>작성일</th>
           <th>조회수</th>
+          <th>댓글 수</th>
           <th>좋아요</th>
         </tr>
       </thead>
       <tbody>
-        <% if (recentPosts.length > 0) { %>
-          <% recentPosts.forEach(post => { %>
+        <% if (recentPosts.length> 0) { %>
+          <% recentPosts.forEach(post=> { %>
             <tr>
-              <td><%= post.id %></td>
-              <td><a href="/posts/<%= post.id %>"><%= post.title %></a></td>
-              <td><%= post.User ? post.User.nickname : '익명' %></td>
-              <td><%= new Date(post.createdAt).toLocaleDateString('ko-KR') %></td>
-              <td><%= post.views %></td>
-              <td><%= post.likes %></td>
+              <td>
+                <%= post.id %>
+              </td>
+              <td><a href="/post/<%= post.id %>">
+                  <%= post.title %>
+                </a></td>
+              <td>
+                <%= post.User ? post.User.nickname : '익명' %>
+              </td>
+              <td>
+                <%= new Date(post.createdAt).toLocaleDateString('ko-KR') %>
+              </td>
+              <td>
+                <%= post.views %>
+              </td>
+              <td>
+                <%= post.get('commentCount') || 0 %>
+              </td>
+              <td>
+                <%= post.likes %>
+              </td>
             </tr>
-          <% }) %>
-        <% } else { %>
-          <tr><td colspan="6" class="admin-no-data">최근 게시물이 없습니다.</td></tr>
-        <% } %>
+            <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="6" class="admin-no-data">최근 게시물이 없습니다.</td>
+                </tr>
+                <% } %>
       </tbody>
     </table>
   </div>
 
-  <!-- Comments Management Section -->
   <div class="admin-section">
-    <h2 class="admin-section-title">모든 댓글 관리</h2>
+    <h2 class="admin-section-title">댓글 관리</h2>
     <div class="admin-filter-controls">
-      <form id="admin-filter-form" action="/admin" method="GET">
-        <select name="veracity" onchange="this.form.submit()">
-          <option value="" <%= !veracity ? 'selected' : '' %>>진실성 필터</option>
-          <option value="TRUE" <%= veracity === 'TRUE' ? 'selected' : '' %>>TRUE</option>
-          <option value="FALSE" <%= veracity === 'FALSE' ? 'selected' : '' %>>FALSE</option>
-          <option value="UNSURE" <%= veracity === 'UNSURE' ? 'selected' : '' %>>UNSURE</option>
+      <form id="admin-filter-form" onsubmit="event.preventDefault(); loadCommentsByFilter(1);">
+        <select name="veracity" onchange="loadCommentsByFilter(1)">
+          <option value="" <%=!veracity ? 'selected' : '' %>>진위 여부 필터</option>
+          <option value="TRUE" <%=veracity==='TRUE' ? 'selected' : '' %>>TRUE</option>
+          <option value="FALSE" <%=veracity==='FALSE' ? 'selected' : '' %>>FALSE</option>
+          <option value="UNSURE" <%=veracity==='UNSURE' ? 'selected' : '' %>>UNSURE</option>
         </select>
+        <select id="sortBy" onchange="loadCommentsByFilter(1)">
+          <option value="createdAt" <%=sortBy==='createdAt' ? 'selected' : '' %>>작성일</option>
+          <option value="hate_score" <%=sortBy==='hate_score' ? 'selected' : '' %>>혐오도</option>
+          <option value="updatedAt" <%=sortBy==='updatedAt' ? 'selected' : '' %>>수정일</option>
+        </select>
+        <select id="sortOrder" onchange="loadCommentsByFilter(1)">
+          <option value="DESC" <%=sortOrder==='DESC' ? 'selected' : '' %>>내림차순</option>
+          <option value="ASC" <%=sortOrder==='ASC' ? 'selected' : '' %>>오름차순</option>
+        </select>
+        
         <input type="text" name="topic" placeholder="주제 필터" value="<%= topic %>">
-        <select name="sortOrder" onchange="this.form.submit()">
-          <option value="DESC" <%= sortOrder === 'DESC' ? 'selected' : '' %>>최신순</option>
-          <option value="ASC" <%= sortOrder === 'ASC' ? 'selected' : '' %>>오래된순</option>
-        </select>
+        <input type="text" name="userNickname" placeholder="작성자 닉네임" value="<%= userNickname %>"
+          onchange="loadCommentsByFilter(1)">
+        <div style="display:flex; gap: 0.5rem; flex-shrink: 0; align-items: center;">
+          <label style="margin-bottom:0; font-weight:normal; color: var(--text-color-secondary);"></label>
+          <input type="date" name="startDate" value="<%= startDate %>" onchange="loadCommentsByFilter(1)"
+            title="작성일 시작">
+          ~
+          <input type="date" name="endDate" value="<%= endDate %>" onchange="loadCommentsByFilter(1)" title="작성일 종료">
+        </div>
+        <button type="submit" style="display:none;"></button> 
       </form>
     </div>
-    <table class="admin-table admin-comments-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>내용</th>
-          <th>작성자</th>
-          <th>증오 점수</th>
-          <th>진실성</th>
-          <th>주제</th>
-          <th>작성일</th>
-          <th>관리</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if (comments.length > 0) { %>
-          <% comments.forEach(comment => { %>
-            <tr class="comment-row" onclick="toggleDetails(this)">
-              <td><%= comment.id %></td>
-              <td class="admin-comment-content"><%= comment.content %></td>
-              <td><%= comment.User ? comment.User.nickname : '익명' %></td>
-              <td class="admin-hate-score"><%= comment.hate_score %></td>
-              <td><%= comment.veracity %></td>
-              <td><%= comment.topic || '-' %></td>
-              <td><%= new Date(comment.createdAt).toLocaleDateString('ko-KR') %></td>
-              <td>
-                <form method="post" action="/comments/<%= comment.id %>/delete" onsubmit="return confirm('이 댓글을 삭제하시겠습니까?')" style="display:inline;">
-                  <button type="submit" class="admin-btn admin-small-btn admin-danger-btn">삭제</button>
-                </form>
-              </td>
-            </tr>
-            <tr class="comment-details" style="display:none;">
-              <td colspan="8">
-                <div class="details-content">
-                  <div class="detail-item">
-                    <strong>진실성 근거:</strong>
-                    <span><%= comment.veracity_reasoning || '근거 없음' %></span>
-                  </div>
-                  <div class="detail-item">
-                    <strong>혐오 표현 분석:</strong>
-                    <span><%= comment.hate_reasoning || '분석 없음' %></span>
-                  </div>
-                  <% if (comment.source) { %>
-                    <div class="detail-item">
-                      <strong>출처:</strong>
-                      <a href="<%= comment.source %>" target="_blank"><%= comment.source %></a>
+
+    <div id="comment-list-container">
+      <table class="admin-table admin-comments-table">
+        <thead>
+          <tr>
+            <th>순번</th>
+            <th>내용</th>
+            <th>작성자</th>
+            <th>혐오도</th>
+            <th>진위 여부</th>
+            <th>주제</th>
+            <th>작성일</th>
+            <th>관리</th>
+          </tr>
+        </thead>
+        <tbody id="comment-table-body">
+          <% if (comments.length> 0) { %>
+            <% comments.forEach((comment, index)=> { %>
+              <% const sequentialNumber=commentCount - ((currentPage - 1) * limit) - index; %>
+                <tr class="comment-row" onclick="toggleDetails(this)">
+                  <td>
+                    <%= sequentialNumber %>
+                  </td>
+                  <td class="admin-comment-content">
+                    <%= comment.content %>
+                  </td>
+                  <td>
+                    <%= comment.User ? comment.User.nickname : '익명' %>
+                  </td>
+                  <td class="admin-hate-score">
+                    <%= comment.hate_score %>
+                  </td>
+                  <td>
+                    <%= comment.veracity %>
+                  </td>
+                  <td>
+                    <%= comment.topic || '-' %>
+                  </td>
+                  <td>
+                    <%= new Date(comment.createdAt).toLocaleDateString('ko-KR') %>
+                  </td>
+                  <td>
+                    <form method="post" action="/comments/<%= comment.id %>/delete"
+                      onsubmit="return confirm('이 댓글을 삭제하시겠습니까?')" style="display:inline;">
+                      <button type="submit" class="admin-btn admin-small-btn admin-danger-btn">삭제</button>
+                    </form>
+                  </td>
+                </tr>
+                <tr class="comment-details" style="display:none;">
+                  <td colspan="8">
+                    <div class="details-content">
+                      <div class="detail-item">
+                        <strong>진위 여부 근거:</strong>
+                        <span>
+                          <%= comment.veracity_reasoning || '근거 없음' %>
+                        </span>
+                      </div>
+                      <div class="detail-item">
+                        <strong>혐오 표현 분석:</strong>
+                        <span>
+                          <%= comment.hate_reasoning || '분석 없음' %>
+                        </span>
+                      </div>
+                      <% if (comment.source) { %>
+                        <div class="detail-item">
+                          <strong>출처:</strong>
+                          <a href="<%= comment.source %>" target="_blank">
+                            <%= comment.source %>
+                          </a>
+                        </div>
+                        <% } %>
                     </div>
-                  <% } %>
-                </div>
-              </td>
-            </tr>
-          <% }) %>
-        <% } else { %>
-          <tr><td colspan="8" class="admin-no-data">댓글이 없습니다.</td></tr>
-        <% } %>
-      </tbody>
-    </table>
+                  </td>
+                </tr>
+                <% }) %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="8" class="admin-no-data">댓글이 없습니다.</td>
+                    </tr>
+                    <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="comment-pagination-controls" style="display:flex; justify-content:center; gap:0.5rem; margin-top:1.5rem;">
+    </div>
   </div>
 </div>
 
 <script>
   function toggleDetails(row) {
-      const detailsRow = row.nextElementSibling;
-      detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
-      row.classList.toggle('active');
+    const detailsRow = row.nextElementSibling;
+    detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
+    row.classList.toggle('active');
   }
+
+  // [추가] EJS에서 초기 데이터 주입 및 var로 변경
+  var commentTotalCount = parseInt('<%= commentCount %>', 10);
+  var commentCurrentPage = parseInt('<%= currentPage %>', 10);
+  var commentTotalPages = parseInt('<%= totalPages %>', 10);
+  var commentsPerPage = parseInt('<%= limit %>', 10);
+
+  const commentTableBody = document.getElementById('comment-table-body');
+  const paginationControls = document.getElementById('comment-pagination-controls');
+  const filterForm = document.getElementById('admin-filter-form');
+  const commentCountDisplay = document.getElementById('comment-count-display');
+
+  // [추가] 댓글 목록 렌더링 함수
+  function renderCommentTableRows(comments) {
+    let html = '';
+    if (comments && comments.length) {
+      comments.forEach((comment, index) => {
+        const nickname = comment.User ? comment.User.nickname : '익명';
+
+        // 내림차순 순번 계산
+        const sequentialNumber = (commentTotalCount - ((commentCurrentPage - 1) * commentsPerPage)) - index;
+        const date = new Date(comment.createdAt).toLocaleDateString('ko-KR');
+
+        html += `
+                  <tr class="comment-row" onclick="toggleDetails(this)">
+                      <td>${sequentialNumber}</td>
+                      <td class="admin-comment-content">${comment.content}</td>
+                      <td>${nickname}</td>
+                      <td class="admin-hate-score">${comment.hate_score}</td>
+                      <td>${comment.veracity}</td>
+                      <td>${comment.topic || '-'}</td>
+                      <td>${date}</td>
+                      <td>
+                          <form method="post" action="/comments/${comment.id}/delete" onsubmit="return confirm('이 댓글을 삭제하시겠습니까?')" style="display:inline;">
+                              <button type="submit" class="admin-btn admin-small-btn admin-danger-btn">삭제</button>
+                          </form>
+                      </td>
+                  </tr>
+                  <tr class="comment-details" style="display:none;">
+                      <td colspan="8">
+                          <div class="details-content">
+                              <div class="detail-item">
+                                  <strong>진위여부 근거:</strong>
+                                  <span>${comment.veracity_reasoning || '근거 없음'}</span>
+                              </div>
+                              <div class="detail-item">
+                                  <strong>혐오 표현 분석:</strong>
+                                  <span>${comment.hate_reasoning || '분석 없음'}</span>
+                              </div>
+                              ${comment.source ? `<div class="detail-item"><strong>출처:</strong><a href="${comment.source}" target="_blank">${comment.source}</a></div>` : ''}
+                          </div>
+                      </td>
+                  </tr>
+              `;
+      });
+    } else {
+      html += `<tr><td colspan="8" class="admin-no-data">댓글이 없습니다.</td></tr>`;
+    }
+    return html;
+  }
+
+  // [추가] 댓글 페이지네이션 렌더링 함수
+  function renderCommentPagination(totalPages, currentPage) {
+    let html = '';
+
+    if (totalPages <= 1) return '';
+
+    // 이전 버튼
+    if (currentPage > 1) {
+      html += `<button class="admin-btn btn-page btn-page-nav" onclick="loadComments(${currentPage - 1})">이전</button>`;
+    }
+
+    // 페이지 번호 (5개 블록)
+    const block = Math.ceil(currentPage / 5);
+    const startPage = (block - 1) * 5 + 1;
+    const endPage = Math.min(totalPages, block * 5);
+
+    for (let i = startPage; i <= endPage; i++) {
+      html += `<button class="admin-btn btn-page ${i === currentPage ? 'active' : ''}" onclick="loadComments(${i})">${i}</button>`;
+    }
+
+    // 다음 버튼
+    if (currentPage < totalPages) {
+      html += `<button class="admin-btn btn-page btn-page-nav" onclick="loadComments(${currentPage + 1})">다음</button>`;
+    }
+
+    return html;
+  }
+
+  // [추가] 댓글 목록 로드 함수
+  async function loadComments(page = 1) {
+    const veracity = filterForm.querySelector('select[name="veracity"]').value;
+    const topic = filterForm.querySelector('input[name="topic"]').value;
+    const userNickname = filterForm.querySelector('input[name="userNickname"]').value;
+    const startDate = filterForm.querySelector('input[name="startDate"]').value;
+    const endDate = filterForm.querySelector('input[name="endDate"]').value;
+    const sortBy = document.getElementById('sortBy').value;
+    const sortOrder = document.getElementById('sortOrder').value;
+
+    try {
+      let url = `/comments?page=${page}&limit=${commentsPerPage}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+      if (veracity) url += `&veracity=${veracity}`;
+      if (topic) url += `&topic=${topic}`;
+      if (userNickname) url += `&userNickname=${userNickname}`;
+      if (startDate) url += `&startDate=${startDate}`;
+      if (endDate) url += `&endDate=${endDate}`;
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('댓글 데이터를 불러오는 데 실패했습니다.');
+      }
+
+      const data = await response.json();
+
+      // 전역 변수 및 UI 업데이트
+      commentTotalCount = data.totalComments; // 총 댓글 수 업데이트
+      commentCurrentPage = data.currentPage;
+      commentTotalPages = data.totalPages;
+      commentCountDisplay.textContent = commentTotalCount; // 총 댓글 수 메트릭 업데이트
+
+      // 1. 테이블 내용 업데이트
+      commentTableBody.innerHTML = renderCommentTableRows(data.comments);
+
+      // 2. 페이지네이션 업데이트
+      paginationControls.innerHTML = renderCommentPagination(commentTotalPages, commentCurrentPage);
+
+      // URL 쿼리 파라미터 업데이트 (뒤로 가기 버튼 지원)
+      const newUrl = `/admin?page=${commentCurrentPage}&sortBy=${sortBy}&sortOrder=${sortOrder}&veracity=${veracity}&topic=${topic}&userNickname=${userNickname}&startDate=${startDate}&endDate=${endDate}`;
+      history.pushState({ page: commentCurrentPage, sortBy, sortOrder, veracity, topic, userNickname, startDate, endDate }, '', newUrl);
+
+    } catch (error) {
+      console.error('Error loading comments:', error);
+      alert('댓글 목록을 불러오는 중 오류가 발생했습니다.');
+    }
+  }
+
+  // [추가] 필터 또는 정렬 변경 시 호출될 함수 (1페이지로 리셋)
+  function loadCommentsByFilter(page = 1) {
+    loadComments(page);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // 페이지 로드 시 초기 페이지네이션 렌더링 (EJS에서 받은 값 기반)
+    paginationControls.innerHTML = renderCommentPagination(commentTotalPages, commentCurrentPage);
+
+    // 토픽 필터의 Enter 키를 loadCommentsByFilter에 연결
+    filterForm.querySelector('input[name="topic"]').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        loadCommentsByFilter(1);
+      }
+    });
+
+    filterForm.querySelector('input[name="userNickname"]').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        loadCommentsByFilter(1);
+      }
+    });
+
+    // 뒤로가기/앞으로가기 버튼 처리
+    window.onpopstate = function (event) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const page = parseInt(urlParams.get('page')) || 1;
+      const sortBy = urlParams.get('sortBy') || 'createdAt';
+      const sortOrder = urlParams.get('sortOrder') || 'DESC';
+      const veracity = urlParams.get('veracity') || '';
+      const topic = urlParams.get('topic') || '';
+      const userNickname = urlParams.get('userNickname') || '';
+      const startDate = urlParams.get('startDate') || '';
+      const endDate = urlParams.get('endDate') || '';
+
+      // 드롭다운/인풋 값 동기화
+      document.getElementById('sortBy').value = sortBy;
+      document.getElementById('sortOrder').value = sortOrder;
+      filterForm.querySelector('select[name="veracity"]').value = veracity;
+      filterForm.querySelector('input[name="topic"]').value = topic;
+
+      // 로드 함수 호출
+      loadComments(page);
+    };
+  });
 </script>

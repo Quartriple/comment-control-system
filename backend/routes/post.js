@@ -67,7 +67,11 @@ router.get('/', async (req, res) => {
         const { count, rows } = await db.Post.findAndCountAll({
             limit: limit,
             offset: offset,
-            order: orderOption
+            order: orderOption,
+            include: [{ 
+                model: db.User,
+                attributes: ['nickname']
+            }]
         });
 
         res.status(200).json({

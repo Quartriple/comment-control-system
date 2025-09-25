@@ -2,34 +2,181 @@
   <div class="card">
     <h1>고객센터 게시판</h1>
     <div class="sub">최근 등록된 글 목록입니다.</div>
-    <table>
-      <thead>
-        <tr>
-          <th class="left-col">글 번호</th>
-          <th>제목</th>
-          <th class="right-col">조회수</th>
-          <th class="right-col">좋아요</th>
-          <th class="right-col">작성자</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if (Array.isArray(posts) && posts.length) { %>
-          <% posts.forEach(function(post){ %>
-            <tr>
-              <td class="left-col"><%= post.id %></td>
-              <td><a href="/post/<%= post.id %>"><%= post.title %></a></td>
-              <td class="right-col"><%= post.views %></td>
-              <td class="right-col"><%= post.likes %></td>
-              <td class="right-col"><%= post.User.nickname %></td>
-            </tr>
-          <% }) %>
-        <% } else { %>
-          <tr>
-            <td colspan="5" style="text-align:center; color:var(--muted); padding:24px;">게시글이 없습니다.</td>
-          </tr>
-        <% } %>
-      </tbody>
-    </table>
-    <a class="btn" href="/post/new" style="display:inline-block; text-decoration:none;">글 작성</a>
+
+    <div class="board-controls">
+        <div class="sort-controls">
+            <!-- <label for="sortBy" style="display:inline; font-weight:normal;">정렬 기준:</label> -->
+            <select id="sortBy" onchange="loadPosts(1)">
+                <option value="createdAt" <%= sortBy === 'createdAt' ? 'selected' : '' %>>작성일</option>
+                <option value="views" <%= sortBy === 'views' ? 'selected' : '' %>>조회수</option>
+                <option value="likes" <%= sortBy === 'likes' ? 'selected' : '' %>>좋아요</option>
+            </select>
+            <select id="sortOrder" onchange="loadPosts(1)">
+                <option value="DESC" <%= sortOrder === 'DESC' ? 'selected' : '' %>>내림차순</option>
+                <option value="ASC" <%= sortOrder === 'ASC' ? 'selected' : '' %>>오름차순</option>
+            </select>
+        </div>
+        <a class="btn" href="/post/new" style="display:inline-block; text-decoration:none;">글 작성</a>
+    </div>
+
+    <div id="post-list-container">
+        <table id="post-table">
+            <thead>
+                <tr>
+                    <th class="left-col">글 번호</th>
+                    <th>제목</th>
+                    <th class="right-col">조회수</th>
+                    <th class="right-col">댓글 수</th>
+                    <th class="right-col">좋아요</th>
+                    <th class="right-col">작성자</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (Array.isArray(posts) && posts.length) { %>
+                    <% posts.forEach(function(post, index){ %>
+                        <tr>
+                          <% const sequentialNumber = totalPosts - ((currentPage - 1) * limit) - index; %>
+                          <% const commentCount = post.get('commentCount') || 0; %>
+                          <td class="left-col"><%= sequentialNumber %></td>
+                          <td><a href="/post/<%= post.id %>"><%= post.title %></a></td>
+                          <td class="right-col"><%= post.views %></td>
+                          <td class="right-col"><%= commentCount %></td>
+                          <td class="right-col"><%= post.likes %></td>
+                          <td class="right-col"><%= post.User.nickname %></td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="5" style="text-align:center; color:var(--muted); padding:24px;">게시글이 없습니다.</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+    
+    <div id="pagination-controls" style="display:flex; justify-content:center; gap:0.5rem; margin-top:1.5rem;">
+        </div>
+
   </div>
 </div>
+
+<script>
+    // EJS에서 초기 데이터 주입
+    var currentPage = parseInt('<%= currentPage %>', 10);
+    var totalPages = parseInt('<%= totalPages %>', 10);
+    var postsPerPage = parseInt('<%= limit %>', 10);
+    var totalPosts = parseInt('<%= totalPosts %>', 10);
+    
+    const postTableBody = document.querySelector('#post-table tbody');
+    const paginationControls = document.getElementById('pagination-controls');
+
+    function renderTableRows(posts) {
+        let html = '';
+        if (posts && posts.length) {
+            posts.forEach((post, index) => {
+                const nickname = post.User ? post.User.nickname : '익명';
+
+                const sequentialNumber = (totalPosts - ((currentPage - 1) * postsPerPage)) - index;
+                const commentCount = post.commentCount || 0;
+                html += `
+                    <tr>
+                        <td class="left-col">${sequentialNumber}</td>
+                        <td><a href="/post/${post.id}">${post.title}</a></td>
+                        <td class="right-col">${post.views}</td>
+                        <td class="right-col">${commentCount}</td>
+                        <td class="right-col">${post.likes}</td>
+                        <td class="right-col">${nickname}</td>
+                    </tr>
+                `;
+            });
+        } else {
+            html += `
+                <tr>
+                    <td colspan="5" style="text-align:center; color:var(--muted); padding:24px;">게시글이 없습니다.</td>
+                </tr>
+            `;
+        }
+        return html;
+    }
+
+    function renderPagination(totalPages, currentPage) {
+        let html = '';
+        
+        // 이전 버튼
+        if (currentPage > 1) {
+            html += `<button class="btn-page btn-page-nav" onclick="loadPosts(${currentPage - 1})">이전</button>`;
+        }
+        
+        // 페이지 번호 (5개 블록)
+        const block = Math.ceil(currentPage / 5);
+        const startPage = (block - 1) * 5 + 1;
+        const endPage = Math.min(totalPages, block * 5);
+        
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<button class="btn-page ${i === currentPage ? 'active' : ''}" onclick="loadPosts(${i})">${i}</button>`;
+        }
+        
+        // 다음 버튼
+        if (currentPage < totalPages) {
+            html += `<button class="btn-page btn-page-nav" onclick="loadPosts(${currentPage + 1})">다음</button>`;
+        }
+        
+        return html;
+    }
+
+    async function loadPosts(page = 1) {
+        const sortBy = document.getElementById('sortBy').value;
+        const sortOrder = document.getElementById('sortOrder').value;
+        
+        try {
+            // /post API를 호출하여 JSON 데이터 요청
+            const url = `/post?page=${page}&limit=${postsPerPage}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+            
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('게시물 데이터를 불러오는 데 실패했습니다.');
+            }
+
+            const data = await response.json();
+            
+            // 전역 변수 및 UI 업데이트
+            totalPosts = data.totalPosts;
+            currentPage = data.currentPage;
+            totalPages = data.totalPages;
+            
+            // 1. 테이블 내용 업데이트
+            postTableBody.innerHTML = renderTableRows(data.posts);
+            
+            // 2. 페이지네이션 업데이트
+            paginationControls.innerHTML = renderPagination(totalPages, currentPage);
+            
+            // URL 쿼리 파라미터 업데이트 (뒤로 가기 버튼 지원)
+            history.pushState({ page: currentPage, sortBy, sortOrder }, '', `/?page=${currentPage}&sortBy=${sortBy}&sortOrder=${sortOrder}`);
+
+        } catch (error) {
+            console.error('Error loading posts:', error);
+            alert('게시물 목록을 불러오는 중 오류가 발생했습니다.');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // 페이지 로드 시 페이지네이션 렌더링
+        paginationControls.innerHTML = renderPagination(totalPages, currentPage);
+        
+        // 뒤로가기/앞으로가기 버튼 처리
+        window.onpopstate = function(event) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const page = parseInt(urlParams.get('page')) || 1;
+            const sortBy = urlParams.get('sortBy') || 'createdAt';
+            const sortOrder = urlParams.get('sortOrder') || 'DESC';
+
+            // 드롭다운 값 동기화
+            document.getElementById('sortBy').value = sortBy;
+            document.getElementById('sortOrder').value = sortOrder;
+            
+            // 로드 함수 호출
+            loadPosts(page); 
+        };
+    });
+
+</script>

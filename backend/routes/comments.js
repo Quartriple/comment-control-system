@@ -51,16 +51,39 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const { postId, userId, veracity, topic, category, sortBy, sortOrder } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const offset = (page - 1) * limit; 
+
+        const { 
+            postId, 
+            userId,
+            userNickname,
+            veracity, 
+            topic, 
+            category, 
+            sortBy, 
+            sortOrder,
+            startDate, 
+            endDate 
+        } = req.query;
         
         const whereClause = {};
         const orderClause = [];
 
+        let targetUserId = req.query.userId || null;
+
+        if (userNickname) {
+            const user = await db.User.findOne({ where: { nickname: userNickname } });
+            if (user) {
+                targetUserId = user.id;
+            } else {
+                targetUserId = -1; // 존재하지 않는 닉네임은 -1로 설정하여 결과 없음 보장
+            }
+        }
+
         if (postId) {
             whereClause.postId = postId;
-        }
-        if (userId) {
-            whereClause.userId = userId;
         }
         if (veracity) {
             whereClause.veracity = veracity.toUpperCase();
@@ -72,15 +95,32 @@ router.get('/', async (req, res) => {
             whereClause.category = { [Op.like]: `%${category}%` };
         }
 
+        if (startDate || endDate) {
+            whereClause.createdAt = {};
+            if (startDate) {
+                // 시작일 (>=)
+                whereClause.createdAt[Op.gte] = new Date(startDate); 
+            }
+            if (endDate) {
+                // 종료일 (다음날 0시 미만, <)
+                const end = new Date(endDate);
+                end.setDate(end.getDate() + 1); 
+                end.setHours(0, 0, 0, 0);      
+                whereClause.createdAt[Op.lt] = end; 
+            }
+        }
+
         const validSortColumns = ['hate_score', 'createdAt', 'updatedAt'];
         const sortColumn = validSortColumns.includes(sortBy) ? sortBy : 'createdAt';
         const sortDirection = ['ASC', 'DESC'].includes(sortOrder?.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
 
         orderClause.push([sortColumn, sortDirection])
 
-        const comments = await db.Comment.findAll({
+        const { count, rows: comments } = await db.Comment.findAndCountAll({
             where: whereClause,
-            orderClause: orderClause,
+            order: orderClause,
+            limit: limit,
+            offset: offset,
             include: [{
                 model: db.User, // 작성자 정보
                 attributes: ['nickname']
@@ -89,7 +129,16 @@ router.get('/', async (req, res) => {
                 attributes: ['title']
             }]
         });
-        res.status(200).json(comments);
+
+        const totalPages = Math.ceil(count / limit);
+
+        res.status(200).json({
+            totalComments: count,
+            currentPage: page,
+            commentsPerPage: limit,
+            totalPages: totalPages,
+            comments: comments
+        });
     } catch (error) {
         console.error('Error fetching comments:', error);
         res.status(500).json({ message: 'An error occurred fetching comments.' });
