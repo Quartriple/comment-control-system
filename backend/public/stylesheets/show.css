@@ -95,7 +95,7 @@ body {
 
 .post-view-container .btn.secondary {
     background-color: var(--secondary-color);
-    color: var(--text-color-primary);
+    color: var(--card-background);
 }
 
 .post-view-container .btn.secondary:hover {
@@ -120,9 +120,9 @@ body {
     font-weight: 500;
 }
 
-.btn-small.btn-edit { background-color: var(--secondary-color); color: var(--text-color-primary); }
+.btn-small.btn-edit { background-color: var(--secondary-color); color: var(--card-background); border: none; }
 .btn-small.btn-edit:hover { background-color: var(--hover-color-secondary); }
-.btn-small.btn-delete { background-color: var(--danger-color); color: var(--card-background); }
+.btn-small.btn-delete { background-color: var(--danger-color); color: var(--card-background); border: none}
 .btn-small.btn-delete:hover { background-color: #C53030; }
 .btn-small.btn-save { background-color: var(--primary-color); color: var(--card-background); }
 .btn-small.btn-save:hover { background-color: var(--hover-color-primary); }

@@ -111,7 +111,7 @@ router.post('/login', async (req, res) => {
         }
 
         req.session.userId = user.id;
-        req.session.isAdmin = true;
+        req.session.isAdmin = user.is_admin;
         console.log(req.session);
 
         res.status(200).json({

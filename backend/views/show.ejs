@@ -15,13 +15,15 @@
       <%= post.content || '' %>
     </div>
     <div class="actions">
+      <% if (user && (user.id===post.userId)) { %>
+        <a class="btn primary" href="/post/<%= post.id %>/edit">게시물 수정</a>
+      <% } %>
       <% if (user && (user.id===post.userId || user.is_admin)) { %>
-        <a class="btn" href="/post/<%= post.id %>/edit">게시물 수정</a>
         <form id="delete-post-form" method="post" onsubmit="return false;" style="display:inline;">
           <button class="btn danger" type="submit">게시물 삭제</button>
         </form>
 
-        <% } %>
+      <% } %>
           <a class="btn secondary" href="/">목록</a>
     </div>
   </div>
