@@ -247,7 +247,6 @@ router.get('/:id', async (req, res) => {
             });
         }
 
-        // 조회수 증가 로직 (선택사항)
         await post.increment('views');
 
         res.render('show', {

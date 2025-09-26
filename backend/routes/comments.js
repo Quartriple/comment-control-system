@@ -81,7 +81,10 @@ router.get('/', async (req, res) => {
                 targetUserId = -1; // 존재하지 않는 닉네임은 -1로 설정하여 결과 없음 보장
             }
         }
-
+        
+        if (targetUserId) {
+            whereClause.userId = targetUserId; // userNickname으로 찾은 ID 또는 -1 적용
+        }
         if (postId) {
             whereClause.postId = postId;
         }

@@ -7,16 +7,15 @@ body {
 
 .wrapper {
     display: flex;
-    /* min-height: 100vh; -> 삭제 (사이드바 고정) */
     color: #333;
 }
 
 /* 사이드바 스타일 */
 .sidebar {
-    width: 280px;
-    position: fixed; /* 사이드바를 화면에 고정*/
-    height: 100vh; /* 사이드바 높이를 화면 전체로 고정하여 스크롤 영향 제거*/
-    overflow-y: auto; /* 사이드바 내용이 길어지면 내부 스크롤바 생성*/
+    width: 280px; /* 확장된 너비 */
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
     background-color: #ffffff;
     color: #4b4b4b;
     padding: 1rem;
@@ -25,10 +24,12 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    z-index: 10;
 }
 
+/* 사이드바 축소 상태 */
 .sidebar.collapsed {
-    width: 60px;
+    width: 60px; /* 축소된 너비 */
     padding: 0.5rem;
 }
 
@@ -63,8 +64,10 @@ body {
     transform: rotate(180deg);
 }
 
+/* 1. 새로운 글 작성 버튼 */
 .new-chat-btn {
     display: flex;
+    width: 100%;
     align-items: center;
     background-color: #e6f2ff;
     color: #1a73e8;
@@ -73,27 +76,30 @@ body {
     padding: 0.75rem 1rem;
     text-decoration: none;
     font-weight: 600;
-    transition: background-color 0.2s;
-    width: 100%;
+    transition: background-color 0.2s, width 0.3s ease, border-radius 0.3s ease;
+}
+
+.new-chat-btn svg {
+    width: 24px; /* [수정] 고정 너비 */
+    height: 24px; /* [수정] 고정 높이 */
+    flex-shrink: 0; /* [수정] 압축 방지 */
+    margin-right: 0.5rem;
+    min-width: 24px; /* 최소 너비 보장 */
 }
 
 .sidebar.collapsed .new-chat-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     padding: 0;
     overflow: hidden;
     justify-content: center;
     align-items: center;
+    margin: 0 auto;
 }
 
 .new-chat-btn:hover {
     background-color: #d1e5ff;
-}
-
-.new-chat-btn svg {
-    margin-right: 0.5rem;
-    min-width: 20px;
 }
 
 .sidebar.collapsed .new-chat-btn svg {
@@ -108,12 +114,12 @@ body {
 
 .sidebar.collapsed .new-chat-btn span {
     opacity: 0;
+    display: none;
 }
 
 /* 사이드바 네비게이션 */
 .sidebar-nav {
     flex-grow: 1;
-    /* overflow-y: auto; -> 사이드바 상위 클래스로 이동 */
     margin-top: 1rem;
 }
 
@@ -127,22 +133,22 @@ body {
     margin-bottom: 0.5rem;
 }
 
+/* 2. 메인 네비게이션 링크 */
 .sidebar-nav a {
     display: flex;
+    width: 100%;
     align-items: center;
     color: #4b4b4b;
     text-decoration: none;
     padding: 0.75rem 1rem;
     border-radius: 20px;
-    transition: background-color 0.2s;
-}
-
-.sidebar-nav a:hover {
-    background-color: #f0f4f9;
-    padding: 0.75rem 1rem; /* hover 시에도 크기 유지*/
+    transition: background-color 0.2s, width 0.3s ease;
 }
 
 .sidebar-nav a svg {
+    width: 24px; /* [수정] 고정 너비 */
+    height: 24px; /* [수정] 고정 높이 */
+    flex-shrink: 0; /* [수정] 압축 방지 */
     min-width: 24px;
     margin-right: 1rem;
     fill: #4b4b4b;
@@ -150,7 +156,9 @@ body {
 
 .sidebar.collapsed .sidebar-nav a {
     justify-content: center;
+    width: 44px;
     padding: 0.75rem 0.5rem;
+    margin: 0 auto;
 }
 
 .sidebar.collapsed .sidebar-nav a svg {
@@ -165,13 +173,64 @@ body {
 .sidebar-footer {
     padding-top: 1rem;
     border-top: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
+/* 3. 푸터 내부 링크 (로그아웃, 로그인/회원가입) */
+.sidebar-footer a {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border-radius: 20px;
+    color: #4b4b4b;
+    transition: background-color 0.2s, width 0.3s ease;
+}
+
+.sidebar-footer a svg {
+    width: 24px; /* [수정] 고정 너비 */
+    height: 24px; /* [수정] 고정 높이 */
+    flex-shrink: 0; /* [수정] 압축 방지 */
+    min-width: 24px;
+    margin-right: 1rem;
+    fill: #4b4b4b;
+}
+
+.sidebar.collapsed .sidebar-footer a {
+    justify-content: center;
+    width: 44px;
+    padding: 0.75rem 0.5rem;
+    margin: 0 auto;
+}
+
+.sidebar-footer a:hover {
+    background-color: #f0f4f9;
+}
+
+.sidebar.collapsed .sidebar-footer a svg {
+    margin-right: 0;
+}
+
+.sidebar-footer a span {
+    white-space: nowrap;
+    overflow: hidden;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .sidebar-footer a span {
+    display: none;
+}
+
+
+/* 메인 콘텐츠 영역 */
 .content {
     flex-grow: 1;
     padding: 2rem;
-    margin-left: 280px; /* 고정된 사이드바의 너비만큼 왼쪽 여백을 줘서 콘텐츠가 겹치지 않게 함*/
-    transition: margin-left 0.3s ease; /* 여백 변화를 부드럽게 처리 */
+    margin-left: 280px;
+    transition: margin-left 0.3s ease;
 }
 
 /* 사이드바가 축소되면, 콘텐츠의 왼쪽 여백을 사이드바의 축소된 너비(60px)만큼 줄입니다. */
