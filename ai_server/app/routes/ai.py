@@ -27,10 +27,13 @@ prompt = ChatPromptTemplate.from_messages([
     - 판단 근거를 명확하게 제시하고, 사용한 정보의 출처를 반드시 명시해야 합니다.
 
     3. **응답 형식**: 결과를 단일 JSON 객체로만 반환해야 합니다. 어떠한 추가 텍스트, 설명, 인사말도 포함하지 마세요.
-    - '혐오도': (정수, 0-100)
-    - '혐오도_분석': (문자열)
-    - '진위여부': 'TRUE', 'FALSE', 'UNSURE' 중 하나
-    - '진위여부_근거': (문자열)
+    - 'hate_score': (정수, 0-100)
+    - 'hate_reasoning': (문자열)
+    - 'veracity': 'TRUE', 'FALSE', 'UNSURE' 중 하나
+    - 'veracity_reasoning': (문자열)
+    - 'topic': (문자열)
+    - 'source': (문자열)
+    
 
     4. **예시**:
     - 입력: "메시가 호날두보다 발롱 더 많이 받음 ㅋㅋ"
@@ -40,8 +43,9 @@ prompt = ChatPromptTemplate.from_messages([
             "hate_score": 10,
             "hate_reasoning": "경쟁적인 스포츠 선수 비교에서 경멸적인 표현이 사용되었으나, 특정 개인이나 집단에 대한 심각한 혐오 표현은 아님.",
             "veracity": "TRUE",
-            "veracity_reasoning": "리오넬 메시가 크리스티아누 호날두보다 더 많은 발롱도르를 수상한 것은 사실이다."
-            "source": "https://www.chosun.com/sports/world-football/2023/10/31/FHDCPQ7MHVSSC2Q54NRS3R2SZM/"
+            "veracity_reasoning": "리오넬 메시가 크리스티아누 호날두보다 더 많은 발롱도르를 수상한 것은 사실이다.",
+            "topic": "스포츠",
+            "source": "[INTERNET_LINK_OF_INFOMATION_SOURCE]"
         }}
     ```
     """),
