@@ -24,7 +24,7 @@ prompt = ChatPromptTemplate.from_messages([
 
     2. **진위 여부 판별 기준**:
     - 댓글의 내용이 사실인지, 거짓인지, 또는 판단하기 어려운지 평가합니다.
-    - 판단 근거를 명확하게 제시하고, 사용한 정보의 출처를 반드시 명시해야 합니다.
+    - 판단 근거를 명확하게 제시하고, **사용한 정보의 출처(가장 관련성이 높은 단일 URL)**를 반드시 'source' 필드에 명시해야 합니다. 검색 결과에 URL이 없으면 빈 문자열("")을 반환하세요.
 
     3. **응답 형식**: 결과를 단일 JSON 객체로만 반환해야 합니다. 어떠한 추가 텍스트, 설명, 인사말도 포함하지 마세요.
     - 'hate_score': (정수, 0-100)
@@ -71,6 +71,76 @@ chain = (
     | (lambda x: x['output'])
     | JsonOutputParser()
 )
+
+@ai_bp.route('/batch-detect', methods=['POST'])
+def batch_detect_hate_speech():
+    data = request.get_json()
+    comments_batch = data.get('comments') # [{'id': 1, 'content': '댓글 내용'}, ...] 형태
+    
+    if not comments_batch or not isinstance(comments_batch, list):
+        return jsonify({'error': 'Comments list is missing or invalid.'}), 400
+    
+    # batch에 적합한 입력 형식으로 변환: { 'input': comment_content } 리스트
+    langchain_inputs = []
+    comment_id_map = {}
+
+    for item in comments_batch:
+        comment_id = item.get('id')
+        comment_content = item.get('content')
+        
+        if comment_content:
+            langchain_inputs.append({'input': comment_content})
+            comment_id_map[len(langchain_inputs) - 1] = comment_id
+    
+    if not langchain_inputs:
+        return jsonify({'results': []}), 200
+    
+    try:
+        raw_results = chain.batch(langchain_inputs)
+    except Exception as e:
+        print(f'An error occurred during AI batch analysis: {e}')
+        return jsonify({'error': 'AI batch analysis failed.'}), 500
+    
+    final_results = []
+    
+    for index, analysis_result in enumerate(raw_results):
+        comment_id = comment_id_map.get(index)
+        
+        if not isinstance(analysis_result, dict):
+            final_results.append({
+                'id': comment_id,
+                'status': 'FAILED',
+                'error': 'AI output parsing failed.'
+            })
+            continue
+        
+        try:
+            hate_score = int(analysis_result.get('hate_score', 0))
+            veracity_str = analysis_result.get('veracity', 'UNSURE').upper()
+            
+            valid_enum_values = ['TRUE', 'FALSE', 'UNSURE']
+            if veracity_str not in valid_enum_values:
+                veracity_str = 'UNSURE'
+                
+            final_results.append({
+                'id': comment_id,
+                'status': 'PROCESSED',
+                'hate_score': hate_score,
+                'hate_reasoning': analysis_result.get('hate_reasoning', ''),
+                'veracity': veracity_str,
+                'veracity_reasoning': analysis_result.get('veracity_reasoning', ''),
+                'source': analysis_result.get('source', ''),
+                'topic': analysis_result.get('topic', ''),
+                'category': analysis_result.get('category', ''),
+            })
+        except Exception as e:
+            final_results.append({
+                'id': comment_id,
+                'status': 'FAILED',
+                'error': f'Result formatting error: {e}'
+            })
+            
+    return jsonify({'results': final_results}), 200
 
 # 댓글 분석을 처리하는 새로운 라우트
 @ai_bp.route('/detect', methods=['POST'])

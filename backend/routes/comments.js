@@ -13,32 +13,18 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const flaskResponse = await fetch('http://localhost:5000/detect', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({comment: content})
-        });
-
-        if (!flaskResponse.ok) {
-            return res.status(500).json({ message: 'Flask Server is not available.'});
-        }
-
-        const aiResult  = await flaskResponse.json();
-
-        // AI 서버 응답에서 새로운 필드를 추출하고 변수에 할당합니다.
-        const { hate_score, hate_reasoning, veracity, veracity_reasoning, source, topic, category } = aiResult;
-
-        const newComment = await db.Comment.create({
+         const newComment = await db.Comment.create({
             content: content,
-            hate_score: hate_score,
-            hate_reasoning: hate_reasoning,
-            veracity: veracity,
-            veracity_reasoning: veracity_reasoning,
-            source: source,
-            topic: topic,
-            category: category,
+            hate_score: 0, 
+            hate_reasoning: null,
+            veracity: 'UNSURE', 
+            veracity_reasoning: null,
+            source: null,
+            topic: null,
+            category: null,
             userId: userId,
-            postId: postId         
+            postId: postId,
+            status: 'PENDING'
         });
 
         res.redirect('back');
@@ -81,7 +67,7 @@ router.get('/', async (req, res) => {
                 targetUserId = -1; // 존재하지 않는 닉네임은 -1로 설정하여 결과 없음 보장
             }
         }
-        
+
         if (targetUserId) {
             whereClause.userId = targetUserId; // userNickname으로 찾은 ID 또는 -1 적용
         }
@@ -168,43 +154,14 @@ router.patch('/:id', async (req, res) => {
             return res.status(403).json({ message: '댓글 수정 권한이 없습니다.' });
         }
         
-        const flaskResponse = await fetch('http://localhost:5000/detect', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({comment: content})
-        });
-
-        if (!flaskResponse.ok) {
-            return res.status(500).json({ message: 'Flask Server is not available.'});
-        }
-
-        const aiResult  = await flaskResponse.json();
-
-        const {
-            hate_score,
-            hate_reasoning,
-            veracity,
-            veracity_reasoning,
-            source,
-            topic,
-            category
-        } = aiResult;
-
         await comment.update({
             content: content,
-            hate_score: hate_score,
-            hate_reasoning: hate_reasoning,
-            veracity: veracity,
-            veracity_reasoning: veracity_reasoning,
-            source: source,
-            topic: topic,
-            category: category
+            status: 'PENDING'
         });
 
         res.status(200).json({
             message: '댓글이 성공적으로 수정되었습니다.',
             comment: comment,
-            analysis: aiResult
         });
 
     } catch (error) {

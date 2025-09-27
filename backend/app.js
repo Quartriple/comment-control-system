@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const fileStore = require('session-file-store')(session);
 const expressLayouts = require('express-ejs-layouts');
+const cron = require('node-cron');
 const port = 3000;
 
 const { syncDatabase } = require('./db');
@@ -12,23 +13,25 @@ const commentsRouter = require('./routes/comments');
 const userRouter = require('./routes/user');
 const postRouter = require('./routes/post');
 const adminRouter = require('./routes/admin');
+const { processCommentBatch } = require('./scheduler')
 
 const app = express();
 
-syncDatabase();
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(expressLayouts);
-app.set('layout', 'layouts/layout');
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use(session({
+async function startServer() {
+  await syncDatabase();
+  
+  // view engine setup
+  app.set('views', path.join(__dirname, 'views'));
+  app.set('view engine', 'ejs');
+  app.use(expressLayouts);
+  app.set('layout', 'layouts/layout');
+  
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
+  app.use(cookieParser());
+  app.use(express.static(path.join(__dirname, 'public')));
+  
+  app.use(session({
     httpOnly: true,    // 자바스크립트를 통해 세션 쿠키를 사용할 수 없도록 함
     secure: false,    // https 환경에서만 session 정보를 주고받도록처리
     secret: 'secret key',    // 암호화하는 데 쓰일 키
@@ -41,14 +44,19 @@ app.use(session({
     store : new fileStore()
   }));
 
-app.use('/', indexRouter);
-app.use('/comments', commentsRouter);
-app.use('/user', userRouter);
-app.use('/post', postRouter);
-app.use('/admin', adminRouter);
+  cron.schedule('* * * * *', processCommentBatch);
+  
+  app.use('/', indexRouter);
+  app.use('/comments', commentsRouter);
+  app.use('/user', userRouter);
+  app.use('/post', postRouter);
+  app.use('/admin', adminRouter);
+  
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+}
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-})
+startServer();
 
 module.exports = app;

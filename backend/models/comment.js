@@ -48,6 +48,12 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true,
         },
+        // 댓글 처리 상태
+        status: {
+            type: DataTypes.ENUM('PENDING', 'PROCESSED', 'FAILED'),
+            allowNull: false,
+            defaultValue: 'PENDING',
+        }
     }, {
         tableName: 'comments',
         timestamps: true,
